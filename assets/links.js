@@ -458,6 +458,51 @@
       </section>`;
   }
 
+  /* ---------- KT videos ----------
+     A workbook project may carry a "videos" section. Opening it shows one
+     player that runs the parts in order: when one ends the next starts, and
+     the list beside it jumps to any part. */
+  function videoSection(name) {
+    const p = window.TrackerState.data.projects.find((x) => x.name === name);
+    return p && (p.sections || []).find((s) => s.type === "videos" && s.items && s.items.length);
+  }
+
+  function videoPlayer(name, sec) {
+    const list = sec.items;
+    return `
+      <div class="opened">
+        <div class="sectionhead"><h2 class="page sub">${esc(name)} knowledge transfer</h2></div>
+        <div class="ktplayer">
+          <video class="ktvideo" controls autoplay playsinline preload="metadata"
+                 data-playlist='${esc(JSON.stringify(list.map((v) => v.src)))}' data-index="0"
+                 src="${esc(list[0].src)}"></video>
+          <ol class="ktlist">${list.map((v, i) =>
+            `<li><button class="ktpart" data-ktindex="${i}" aria-current="${i === 0}">${esc(v.name)}</button></li>`).join("")}</ol>
+        </div>
+      </div>`;
+  }
+
+  function ktPlay(video, i) {
+    const list = JSON.parse(video.dataset.playlist || "[]");
+    if (i < 0 || i >= list.length) return;
+    video.dataset.index = String(i);
+    video.src = list[i];
+    video.play().catch(() => { /* autoplay refused: the controls are there */ });
+    document.querySelectorAll(".ktpart").forEach((b) =>
+      b.setAttribute("aria-current", String(Number(b.dataset.ktindex) === i)));
+  }
+
+  // "ended" does not bubble, so listen in the capture phase.
+  document.addEventListener("ended", (e) => {
+    const v = e.target;
+    if (v && v.classList && v.classList.contains("ktvideo")) ktPlay(v, Number(v.dataset.index) + 1);
+  }, true);
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("[data-ktindex]");
+    const v = document.querySelector(".ktvideo");
+    if (b && v) ktPlay(v, Number(b.dataset.ktindex));
+  });
+
   /** Overview: the Projects table, and the picked project's tables beneath it. */
   function overview() {
     const g = selected ? groupByKey(selected) : null;
@@ -471,7 +516,7 @@
         </div>
       </div>
       ${projectsTable()}
-      ${g ? `
+      ${g && videoSection(g.name) ? videoPlayer(g.name, videoSection(g.name)) : g ? `
         <div class="opened">
           <div class="sectionhead">
             <h2 class="page sub">Table of Artifacts</h2>

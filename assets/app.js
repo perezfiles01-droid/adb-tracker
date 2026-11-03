@@ -604,7 +604,10 @@
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((d) => {
       // Clean slate on the live ADB site: no workbook projects or rows.
-      if (window.TRACKER_CLEAN) d = { ...d, projects: [], daily: [], communications: [] };
+      // Projects marked edition "adb" (ADB KT) belong to that site alone.
+      if (window.TRACKER_CLEAN) d = { ...d, daily: [], communications: [],
+        projects: d.projects.filter((p) => p.edition === "adb") };
+      else d = { ...d, projects: d.projects.filter((p) => p.edition !== "adb") };
       state.data = d;
       render();
     })

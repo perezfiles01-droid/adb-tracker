@@ -723,3 +723,12 @@ body[data-signed-in="no"] .topbar{display:none}
 .genprompt{font-weight:600;line-height:1.35;word-break:break-word;font-size:13.5px}
 .gencard .m{font-size:12px;color:var(--muted);word-break:break-word}
 .genactions{display:flex;gap:6px;align-items:center;justify-content:flex-end}
+
+/* KT video player (ADB KT project) */
+.ktplayer { display: grid; grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr); gap: 16px; align-items: start; }
+.ktvideo { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 16 / 9; }
+.ktlist { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.ktpart { width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line, #333);
+  background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.ktpart[aria-current="true"] { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+@media (max-width: 760px) { .ktplayer { grid-template-columns: 1fr; } }
