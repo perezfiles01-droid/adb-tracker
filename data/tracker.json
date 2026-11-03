@@ -1000,7 +1000,14 @@
         }
        ]
       }
-     ]
+     ],
+     "blurb": "Introduction, key terms, declaring a record, roles, releases and more."
+    },
+    {
+     "title": "FAQ Videos",
+     "type": "videos",
+     "blurb": "Short videos answering common questions.",
+     "items": []
     }
    ]
   }

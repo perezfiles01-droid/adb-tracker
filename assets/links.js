@@ -531,6 +531,46 @@
       </article>`;
   }
 
+  /* ---------- the project's hub ----------
+     A project carrying a book opens to a row of cards, one per learning
+     section (the book, FAQ videos). Clicking a card opens it underneath;
+     clicking it again closes it. */
+  let hubOpen = "";
+  function hubSections(name) {
+    const p = window.TrackerState.data.projects.find((x) => x.name === name);
+    return ((p && p.sections) || []).filter((s) => s.type === "book" || s.type === "videos");
+  }
+  function hubView(name) {
+    const secs = hubSections(name);
+    const open = secs.find((s) => slug(s.title) === hubOpen);
+    return `
+      <div class="opened">
+        <div class="ptiles hubtiles">${secs.map((s) => `
+          <button class="ptile${open === s ? " picked" : ""}" data-hub="${esc(slug(s.title))}" aria-expanded="${open === s}">
+            <span class="t">${s.type === "book" ? "📘" : "🎬"} ${esc(s.title)}</span>
+            ${s.blurb ? `<span class="psub">${esc(s.blurb)}</span>` : ""}
+          </button>`).join("")}</div>
+        ${!open ? "" : open.type === "book" ? bookView(name, open) : faqView(open)}
+      </div>`;
+  }
+  function faqView(sec) {
+    const vids = sec.items || [];
+    return `
+      <div class="opened">
+        <div class="sectionhead"><h2 class="page sub">${esc(sec.title)}</h2></div>
+        ${vids.length ? `<div class="faqgrid">${vids.map((v) => `
+          <figure class="faqitem"><video controls playsinline preload="metadata" src="${esc(v.src)}"></video>
+            <figcaption>${esc(v.name)}</figcaption></figure>`).join("")}</div>`
+          : `<div class="empty">No FAQ videos added yet.</div>`}
+      </div>`;
+  }
+  document.addEventListener("click", (e) => {
+    const h = e.target.closest && e.target.closest("[data-hub]");
+    if (!h) return;
+    hubOpen = hubOpen === h.dataset.hub ? "" : h.dataset.hub;
+    if (window.TrackerRender) window.TrackerRender();
+  });
+
   let bookPage = 0;
   function bookView(name, sec) {
     const ch = sec.items, ov = bookEdits();
@@ -628,7 +668,7 @@
         </div>
       </div>
       ${projectsTable()}
-      ${g && bookSection(g.name) ? bookView(g.name, bookSection(g.name)) : g ? `
+      ${g && bookSection(g.name) ? hubView(g.name) : g ? `
         <div class="opened">
           <div class="sectionhead">
             <h2 class="page sub">Table of Artifacts</h2>
