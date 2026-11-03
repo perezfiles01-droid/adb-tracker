@@ -549,10 +549,10 @@
   },
   {
    "id": "adb-kt",
-   "name": "ADB KT",
+   "name": "ADB",
    "edition": "adb",
    "full": "ADB EDRMS knowledge transfer",
-   "blurb": "Learn ADB EDRMS from scratch. 8 short, visual chapters with the KT videos.",
+   "blurb": "Asian Development Bank",
    "sections": [
     {
      "title": "ADB KT book",
