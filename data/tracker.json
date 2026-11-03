@@ -928,19 +928,6 @@
          "text": "In short: each sign-off is a gate. A release proceeds only when the previous gate is closed."
         },
         {
-         "type": "quiz",
-         "items": [
-          [
-           "What is the CAB?",
-           "The Change Advisory Board. It approves changes before production deployment."
-          ],
-          [
-           "What is hypercare?",
-           "A period of close monitoring after go-live. Fixes released in this period are hotfixes."
-          ]
-         ]
-        },
-        {
          "type": "video",
          "name": "Part 3, How A Release Is Delivered",
          "src": "videos/EDRMS_KT_Part3_How_A_Release_Is_Delivered.mp4"
