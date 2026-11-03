@@ -462,7 +462,7 @@
   function overview() {
     const g = selected ? groupByKey(selected) : null;
     return `
-      <h2 class="page">Projects</h2>
+      <h2 class="page">${window.TRACKER_CLEAN ? "Project Knowledge" : "Projects"}</h2>
       <div class="sectionhead">
         <div class="sectionleft">${searchBox("projects", "Search projects…")}</div>
         <div class="sectiontools">

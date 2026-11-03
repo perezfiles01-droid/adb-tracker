@@ -19,7 +19,7 @@
      Same database and same object store, so nothing already saved moves or is
      re-keyed: an attachment written by the previous version is read by this
      one without migration. */
-  /* ADB Tracker is a clone served from the same github.io origin as Project
+  /* Project Knowledge is a clone served from the same github.io origin as Project
      Tracker, so both share one localStorage and one IndexedDB. NS keeps this
      copy's bytes apart. It applies only under /adb-tracker/, so the browser
      checks (file:// and localhost) still see the plain key names. */

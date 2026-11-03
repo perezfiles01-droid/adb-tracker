@@ -402,7 +402,12 @@
     return [own ? `p:${own.id}` : `g:${g.key}`, g.name, null];
   });
 
-  const navGroups = () => [
+  // On the live ADB site only the Index group is shown, as asked. The other
+  // routes still exist and open by address.
+  const navGroups = () => window.TRACKER_CLEAN ? [
+    { title: "Index", items: [["overview", "Project Knowledge", window.TrackerLinks.resolved().length]] },
+  ] : fullNavGroups();
+  const fullNavGroups = () => [
     { title: "Index", items: [["overview", "Overview", window.TrackerLinks.resolved().length]] },
     { title: "Projects", items: projectNav(), scroll: true },
     { title: "Task", items: [
@@ -598,6 +603,8 @@
   fetch("data/tracker.json")
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((d) => {
+      // Clean slate on the live ADB site: no workbook projects or rows.
+      if (window.TRACKER_CLEAN) d = { ...d, projects: [], daily: [], communications: [] };
       state.data = d;
       render();
     })

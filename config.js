@@ -26,3 +26,10 @@ window.TRACKER_CONFIG = {
     appId: ""
   }
 };
+
+/* Project Knowledge's clean slate. True only on the live site under /adb-tracker/:
+   there the sidebar shows just the Index group and the workbook's sample
+   projects, links and daily rows are not loaded. The browser checks run from
+   file:// and localhost, so they still exercise the full app and its data. */
+window.TRACKER_CLEAN = typeof location !== "undefined" &&
+  /^\/adb-tracker(\/|$)/i.test(location.pathname);
