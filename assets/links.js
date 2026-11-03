@@ -553,14 +553,28 @@
         ${!open ? "" : open.type === "book" ? bookView(name, open) : faqView(open)}
       </div>`;
   }
+  /* FAQ: a list of questions. Each opens to its videos; a video with no
+     src yet shows as a "Coming soon" slot so the structure is visible now. */
   function faqView(sec) {
-    const vids = sec.items || [];
+    const qs = sec.items || [];
     return `
       <div class="opened">
         <div class="sectionhead"><h2 class="page sub">${esc(sec.title)}</h2></div>
-        ${vids.length ? `<div class="faqgrid">${vids.map((v) => `
-          <figure class="faqitem"><video controls playsinline preload="metadata" src="${esc(v.src)}"></video>
-            <figcaption>${esc(v.name)}</figcaption></figure>`).join("")}</div>`
+        ${qs.length ? `<div class="faqlist">${qs.map((q, i) => `
+          <details class="faqq"${i === 0 ? " open" : ""}>
+            <summary><span class="faqnum">${i + 1}</span>${esc(q.question)}</summary>
+            <div class="faqhowlist">${(q.videos || []).map((v) => `
+              <section class="faqhow">
+                <div class="faqhow-head"><span class="faqhow-icon">${esc(v.icon || "🎬")}</span>
+                  <div><h4>${esc(v.name)}${v.release ? ` <span class="tag">${esc(v.release)}</span>` : ""}</h4>
+                  ${v.desc ? `<p>${esc(v.desc)}</p>` : ""}</div></div>
+                ${v.steps ? `<ol class="bk-steplist">${v.steps.map(([t, x], j) =>
+                  `<li><span class="bk-num">${j + 1}</span><span></span><div><b>${esc(t)}</b><span>${esc(x)}</span></div></li>`).join("")}</ol>` : ""}
+                <div class="faqvid">${v.src
+                  ? `<video controls playsinline preload="metadata" src="${esc(v.src)}"></video>`
+                  : `<div class="faqsoon"><span>🎬</span><em>Video coming soon</em></div>`}</div>
+              </section>`).join("")}</div>
+          </details>`).join("")}</div>`
           : `<div class="empty">No FAQ videos added yet.</div>`}
       </div>`;
   }
