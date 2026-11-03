@@ -831,3 +831,13 @@ body[data-signed-in="no"] .topbar{display:none}
 .faqhow .bk-steplist li { grid-template-columns: 34px 0 1fr; }
 .faqvid { margin-top: 12px; max-width: 560px; }
 .faqvid video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 16 / 9; }
+#sitegate { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; color: var(--text);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg); }
+html.gated body { overflow: hidden; }
+html.gated body > * { visibility: hidden; }
+.gatebox { width: min(380px, 100%); display: grid; gap: 12px; text-align: center; padding: 28px; border-radius: 16px;
+  border: 1px solid var(--line); background: var(--panel); }
+.gatelogo { font-size: 2.4rem; } .gatebox h1 { margin: 0; font-size: 1.4rem; } .gatebox p { margin: 0; opacity: .75; }
+.gatebox input { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: inherit; font: inherit; }
+.gateerr { min-height: 1.2em; color: #ef4444; font-size: .9rem; }
