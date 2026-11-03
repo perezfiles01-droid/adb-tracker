@@ -552,23 +552,266 @@
    "name": "ADB KT",
    "edition": "adb",
    "full": "ADB EDRMS knowledge transfer",
-   "blurb": "Knowledge transfer videos for the ADB EDRMS programme. Plays all three parts in order.",
+   "blurb": "Learn ADB EDRMS from scratch. A short book in 8 chapters, with the KT videos.",
    "sections": [
     {
-     "title": "KT videos",
-     "type": "videos",
+     "title": "ADB KT book",
+     "type": "book",
      "items": [
       {
-       "name": "Part 1: Introduction",
-       "src": "videos/EDRMS_KT_Part1_Introduction.mp4"
+       "title": "Start here",
+       "lead": "ADB + EDRMS in one minute.",
+       "points": [
+        "ADB = Asian Development Bank, Manila.",
+        "ADB makes thousands of documents a day.",
+        "Some must become official records.",
+        "A record is kept safe, kept for a set time, then disposed of.",
+        "EDRMS does this. It is built by AvePoint on SharePoint / Microsoft 365."
+       ],
+       "video": {
+        "name": "Part 1: Introduction",
+        "src": "videos/EDRMS_KT_Part1_Introduction.mp4"
+       },
+       "quiz": [
+        [
+         "What does EDRMS stand for?",
+         "Electronic Document and Records Management System."
+        ],
+        [
+         "Who builds it?",
+         "AvePoint, on SharePoint and Microsoft 365."
+        ]
+       ]
       },
       {
-       "name": "Part 2: The Release Journey",
-       "src": "videos/EDRMS_KT_Part2_The_Release_Journey.mp4"
+       "title": "Key words",
+       "lead": "Learn these and the rest is easy.",
+       "terms": [
+        [
+         "Record",
+         "A document locked as official. Cannot be edited or deleted."
+        ],
+        [
+         "Declare",
+         "Turn a document into a record."
+        ],
+        [
+         "Site",
+         "A SharePoint site set up for records (EDRMS compliant)."
+        ],
+        [
+         "Library",
+         "A filing cabinet inside a site. Folders are its drawers."
+        ],
+        [
+         "Retention label",
+         "How long a record is kept: 5, 7, 10 years or permanent. Set by the library."
+        ],
+        [
+         "Sensitivity label",
+         "How confidential a document is. Needed for Word/Excel, not for images, video or email files."
+        ],
+        [
+         "Physical counterpart",
+         "A paper copy also exists."
+        ],
+        [
+         "Disposal",
+         "What happens when the keeping time ends."
+        ]
+       ],
+       "quiz": [
+        [
+         "Who decides the retention label?",
+         "The library. Each library maps to one label."
+        ],
+        [
+         "Does an email file need a sensitivity label?",
+         "No. Audiovisual and email files do not."
+        ]
+       ]
       },
       {
-       "name": "Part 3: How A Release Is Delivered",
-       "src": "videos/EDRMS_KT_Part3_How_A_Release_Is_Delivered.mp4"
+       "title": "Document to record: 7 steps",
+       "lead": "What a user actually does.",
+       "steps": [
+        "Open an EDRMS compliant site.",
+        "Pick a library (and folder).",
+        "Create or upload the document.",
+        "Check it has a sensitivity label (if needed).",
+        "… > Declare as record. Answer: paper copy? Yes / No.",
+        "Submit. A lock icon appears.",
+        "Check the Record Management Review view: retention + sensitivity label."
+       ],
+       "quiz": [
+        [
+         "How do you know a file is now a record?",
+         "It shows a lock icon."
+        ],
+        [
+         "Where do you check its labels?",
+         "The Record Management Review view."
+        ]
+       ]
+      },
+      {
+       "title": "Who's who",
+       "lead": "Three groups, one project.",
+       "terms": [
+        [
+         "RAC",
+         "ADB's records team. Owns requirements, signs off, runs UAT."
+        ],
+        [
+         "ITD",
+         "ADB's IT department. Its TCS QA team tests every release (SIT, sanity)."
+        ],
+        [
+         "AvePoint",
+         "Delivery team. BAs write requirements, devs build, AvePoint QA tests first."
+        ]
+       ],
+       "quiz": [
+        [
+         "Who runs UAT?",
+         "RAC."
+        ],
+        [
+         "Who runs SIT?",
+         "ITD's TCS QA team."
+        ]
+       ]
+      },
+      {
+       "title": "The release journey",
+       "lead": "One capability per release.",
+       "timeline": [
+        [
+         "Apr 2025",
+         "1.1",
+         "Sites, libraries + first records declaration. Cloud Governance set up."
+        ],
+        [
+         "Nov 2025",
+         "1.2 / 1.2.1",
+         "Multimedia records. Native retention label option disabled."
+        ],
+        [
+         "Jan 2026",
+         "2026.1",
+         "Declare many documents at once."
+        ],
+        [
+         "Mar 2026",
+         "2026.2",
+         "Centralized records declaration."
+        ],
+        [
+         "Jun 2026",
+         "2026.3",
+         "Declare emails from Outlook (alpha). 2026.3.1 in progress."
+        ],
+        [
+         "Dec 2026",
+         "2026.4",
+         "EDRMS Utilization Report (current)."
+        ],
+        [
+         "On hold",
+         "2026.5",
+         "Physical records management."
+        ]
+       ],
+       "points": [
+        "Next on the roadmap: retention label mapping, records disposition, site renewal, and more."
+       ],
+       "video": {
+        "name": "Part 2: The Release Journey",
+        "src": "videos/EDRMS_KT_Part2_The_Release_Journey.mp4"
+       },
+       "quiz": [
+        [
+         "What is the current release?",
+         "2026.4, the EDRMS Utilization Report."
+        ],
+        [
+         "Why were native retention labels disabled?",
+         "So labels are only applied the EDRMS way, by library."
+        ]
+       ]
+      },
+      {
+       "title": "How a release is delivered",
+       "lead": "17 steps, 4 stages. Like building a house.",
+       "stages": [
+        [
+         "Plan",
+         "Requirements from RAC → feasibility → workshop → dev assessment → RAC confirms → backlog in ADO → estimates → backlog sign-off."
+        ],
+        [
+         "Build",
+         "Development → AvePoint QA (writes test cases)."
+        ],
+        [
+         "Test",
+         "SIT by TCS QA → UAT by RAC → UAT completion report."
+        ],
+        [
+         "Go live",
+         "CAB approval → production deploy → sanity test → hypercare."
+        ]
+       ],
+       "points": [
+        "Each sign-off is a gate. No gate, no next step."
+       ],
+       "video": {
+        "name": "Part 3: How A Release Is Delivered",
+        "src": "videos/EDRMS_KT_Part3_How_A_Release_Is_Delivered.mp4"
+       },
+       "quiz": [
+        [
+         "What is CAB?",
+         "Change Advisory Board. Approves changes before production."
+        ],
+        [
+         "What is hypercare?",
+         "Close watch after go-live. Quick fixes are hotfixes."
+        ]
+       ]
+      },
+      {
+       "title": "The Utilization Report",
+       "lead": "Release 2026.4. The current project.",
+       "points": [
+        "Dashboards showing how departments use EDRMS.",
+        "Built first as a prototype. The real thing will be Power BI.",
+        "Views: Bank-wide Oversight, Department Insights, Project Insights, File Plan, Retention & Disposal, Records & Archive Holdings.",
+        "Data: declared records live in the drm-npr database (Records table).",
+        "Catch: undeclared documents have no row anywhere, so % figures need a new source.",
+        "Plan: UAT 24 Nov – 4 Dec 2026. Go-live 11 Dec 2026."
+       ],
+       "quiz": [
+        [
+         "What tool is the final report built in?",
+         "Power BI."
+        ],
+        [
+         "Why can't some % figures be shown yet?",
+         "Undeclared documents are not stored anywhere yet."
+        ]
+       ]
+      },
+      {
+       "title": "Cheat sheet",
+       "lead": "The whole book on one page.",
+       "points": [
+        "EDRMS = turn documents into protected records.",
+        "Library decides the retention label.",
+        "7 steps: site → library → upload → label → declare → submit → check.",
+        "RAC asks, AvePoint builds, ITD tests.",
+        "Plan → Build → Test → Go live. Every sign-off is a gate.",
+        "Now: 2026.4 Utilization Report, go-live 11 Dec 2026."
+       ]
       }
      ]
     }

@@ -458,49 +458,70 @@
       </section>`;
   }
 
-  /* ---------- KT videos ----------
-     A workbook project may carry a "videos" section. Opening it shows one
-     player that runs the parts in order: when one ends the next starts, and
-     the list beside it jumps to any part. */
-  function videoSection(name) {
+  /* ---------- KT book ----------
+     A workbook project may carry a "book" section: short chapters to learn
+     the project from scratch. Opening the project shows the reader. All
+     chapters are in the DOM; the buttons only show one, so switching never
+     re-renders the page or restarts a video. */
+  function bookSection(name) {
     const p = window.TrackerState.data.projects.find((x) => x.name === name);
-    return p && (p.sections || []).find((s) => s.type === "videos" && s.items && s.items.length);
+    return p && (p.sections || []).find((s) => s.type === "book" && s.items && s.items.length);
   }
 
-  function videoPlayer(name, sec) {
-    const list = sec.items;
+  function chapterHtml(c, i, n) {
+    const list = (xs) => `<ul class="bk-points">${xs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    return `
+      <article class="bk-page" data-bkpage="${i}"${i ? " hidden" : ""}>
+        <div class="bk-count">Chapter ${i + 1} of ${n}</div>
+        <h3 class="bk-title">${esc(c.title)}</h3>
+        ${c.lead ? `<p class="bk-lead">${esc(c.lead)}</p>` : ""}
+        ${c.steps ? `<ol class="bk-steps">${c.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}
+        ${c.terms ? `<dl class="bk-terms">${c.terms.map(([t, d]) =>
+            `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join("")}</dl>` : ""}
+        ${c.timeline ? `<ol class="bk-time">${c.timeline.map(([w, r, d]) =>
+            `<li><span class="bk-when">${esc(w)}</span><b>${esc(r)}</b><span>${esc(d)}</span></li>`).join("")}</ol>` : ""}
+        ${c.stages ? `<ol class="bk-stages">${c.stages.map(([t, d]) =>
+            `<li><b>${esc(t)}</b><span>${esc(d)}</span></li>`).join("")}</ol>` : ""}
+        ${c.points ? list(c.points) : ""}
+        ${c.video ? `<div class="bk-video"><div class="bk-label">Watch: ${esc(c.video.name)}</div>
+            <video controls playsinline preload="metadata" src="${esc(c.video.src)}"></video></div>` : ""}
+        ${c.quiz ? `<div class="bk-quiz"><div class="bk-label">Check yourself (tap to reveal)</div>${c.quiz.map(([q, a]) =>
+            `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>` : ""}
+        <div class="bk-nav">
+          <button class="btn" data-bkgo="${i - 1}"${i ? "" : " disabled"}>← Back</button>
+          <button class="btn primary" data-bkgo="${i + 1}"${i < n - 1 ? "" : " disabled"}>Next →</button>
+        </div>
+      </article>`;
+  }
+
+  function bookView(name, sec) {
+    const ch = sec.items;
     return `
       <div class="opened">
-        <div class="sectionhead"><h2 class="page sub">${esc(name)} knowledge transfer</h2></div>
-        <div class="ktplayer">
-          <video class="ktvideo" controls autoplay playsinline preload="metadata"
-                 data-playlist='${esc(JSON.stringify(list.map((v) => v.src)))}' data-index="0"
-                 src="${esc(list[0].src)}"></video>
-          <ol class="ktlist">${list.map((v, i) =>
-            `<li><button class="ktpart" data-ktindex="${i}" aria-current="${i === 0}">${esc(v.name)}</button></li>`).join("")}</ol>
+        <div class="sectionhead"><h2 class="page sub">${esc(name)}: learn from scratch</h2></div>
+        <div class="bk">
+          <nav class="bk-toc"><ol>${ch.map((c, i) =>
+            `<li><button data-bkgo="${i}" aria-current="${i === 0}">${esc(c.title)}</button></li>`).join("")}</ol></nav>
+          <div class="bk-body">${ch.map((c, i) => chapterHtml(c, i, ch.length)).join("")}</div>
         </div>
       </div>`;
   }
 
-  function ktPlay(video, i) {
-    const list = JSON.parse(video.dataset.playlist || "[]");
-    if (i < 0 || i >= list.length) return;
-    video.dataset.index = String(i);
-    video.src = list[i];
-    video.play().catch(() => { /* autoplay refused: the controls are there */ });
-    document.querySelectorAll(".ktpart").forEach((b) =>
-      b.setAttribute("aria-current", String(Number(b.dataset.ktindex) === i)));
-  }
-
-  // "ended" does not bubble, so listen in the capture phase.
-  document.addEventListener("ended", (e) => {
-    const v = e.target;
-    if (v && v.classList && v.classList.contains("ktvideo")) ktPlay(v, Number(v.dataset.index) + 1);
-  }, true);
   document.addEventListener("click", (e) => {
-    const b = e.target.closest && e.target.closest("[data-ktindex]");
-    const v = document.querySelector(".ktvideo");
-    if (b && v) ktPlay(v, Number(b.dataset.ktindex));
+    const b = e.target.closest && e.target.closest("[data-bkgo]");
+    if (!b || b.disabled) return;
+    const i = Number(b.dataset.bkgo);
+    const pages = document.querySelectorAll(".bk-page");
+    if (i < 0 || i >= pages.length) return;
+    pages.forEach((pg) => {
+      const on = Number(pg.dataset.bkpage) === i;
+      pg.hidden = !on;
+      if (!on) pg.querySelectorAll("video").forEach((v) => v.pause());
+    });
+    document.querySelectorAll(".bk-toc [data-bkgo]").forEach((t) =>
+      t.setAttribute("aria-current", String(Number(t.dataset.bkgo) === i)));
+    const top = document.querySelector(".bk");
+    if (top && b.closest(".bk-nav")) top.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   /** Overview: the Projects table, and the picked project's tables beneath it. */
@@ -516,7 +537,7 @@
         </div>
       </div>
       ${projectsTable()}
-      ${g && videoSection(g.name) ? videoPlayer(g.name, videoSection(g.name)) : g ? `
+      ${g && bookSection(g.name) ? bookView(g.name, bookSection(g.name)) : g ? `
         <div class="opened">
           <div class="sectionhead">
             <h2 class="page sub">Table of Artifacts</h2>
