@@ -813,3 +813,12 @@ body[data-signed-in="no"] .topbar{display:none}
 .faqgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 .faqitem { margin: 0; } .faqitem video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 16 / 9; }
 .faqitem figcaption { margin-top: 6px; font-weight: 600; }
+.faqlist { display: grid; gap: 12px; }
+.faqq { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--panel); }
+.faqq summary { cursor: pointer; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 12px; }
+.faqq[open] summary { margin-bottom: 14px; }
+.faqnum { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-size: .85rem; flex: none; }
+.faqgrid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+.faqsoon { aspect-ratio: 16 / 9; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-items: center; align-content: center; gap: 6px;
+  background: rgba(128,128,128,.06); }
+.faqsoon span { font-size: 2rem; } .faqsoon em { font-style: normal; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; opacity: .6; }

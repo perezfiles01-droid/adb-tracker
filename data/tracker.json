@@ -1007,7 +1007,29 @@
      "title": "FAQ Videos",
      "type": "videos",
      "blurb": "Short videos answering common questions.",
-     "items": []
+     "items": [
+      {
+       "question": "How to declare a record?",
+       "videos": [
+        {
+         "name": "Declaring a single record",
+         "icon": "📄"
+        },
+        {
+         "name": "Declaring multiple records",
+         "icon": "📚"
+        },
+        {
+         "name": "Declaring an email in Outlook",
+         "icon": "📧"
+        },
+        {
+         "name": "Declaring a centralized email",
+         "icon": "🏛️"
+        }
+       ]
+      }
+     ]
     }
    ]
   }
