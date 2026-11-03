@@ -803,3 +803,5 @@ body[data-signed-in="no"] .topbar{display:none}
 @media (prefers-reduced-motion: reduce) { .bk-in * , .bk-hero-icon, .bk-dot { animation: none !important; } }
 @media (max-width: 760px) { .bk { grid-template-columns: 1fr; } .bk-toc ol { position: static; }
   .bk-arrow { transform: rotate(90deg); flex-basis: 100%; text-align: center; } .bk-flow { flex-direction: column; } }
+.bk-intro { font-size: 1.15rem; opacity: .8; margin: 0; }
+.bk-para p { margin: 0; font-size: 1.08rem; }
