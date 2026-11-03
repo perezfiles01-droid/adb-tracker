@@ -486,13 +486,15 @@
           `<li ${d()}><span class="bk-num">${j + 1}</span><span class="bk-step-icon">${esc(ic)}</span>
            <div><b>${esc(t)}</b><span>${esc(s2)}</span></div></li>`).join("")}</ol>`;
       case "timeline": return `<ol class="bk-timeline">${b.items.map(([w, r, ic, t]) =>
-          `<li ${d()}${/we are here/.test(t) ? ' class="now"' : ""}><span class="bk-dot">${esc(ic)}</span>
+          `<li ${d()}${/Current release/.test(t) ? ' class="now"' : ""}><span class="bk-dot">${esc(ic)}</span>
            <div><span class="bk-when">${esc(w)} · <b>${esc(r)}</b></span><span>${esc(t)}</span></div></li>`).join("")}</ol>`;
       case "analogy": return `<div class="bk-analogy"><span>💡</span><p>${esc(b.text)}</p></div>`;
+      case "intro": return `<p class="bk-intro">${esc(b.text)}</p>`;
+      case "para": return `<div class="bk-para">${b.label ? `<div class="bk-label">${esc(b.label)}</div>` : ""}<p>${esc(b.text)}</p></div>`;
       case "takeaway": return `<div class="bk-takeaway"><div class="bk-label">Remember this</div><p>${esc(b.text)}</p></div>`;
-      case "quiz": return `<div class="bk-quiz"><div class="bk-label">Quick check: tap to reveal</div>${b.items.map(([q, a]) =>
+      case "quiz": return `<div class="bk-quiz"><div class="bk-label">Review questions</div>${b.items.map(([q, a]) =>
           `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`;
-      case "video": return `<div class="bk-video"><div class="bk-label">🎬 Watch: ${esc(b.name)}</div>
+      case "video": return `<div class="bk-video"><div class="bk-label">🎬 Video: ${esc(b.name)}</div>
           <video controls playsinline preload="metadata" src="${esc(b.src)}"></video></div>`;
       default: return "";
     }
@@ -517,7 +519,7 @@
     const ch = sec.items;
     return `
       <div class="opened">
-        <div class="sectionhead"><h2 class="page sub">${esc(name)}: learn from scratch</h2></div>
+        <div class="sectionhead"><h2 class="page sub">${esc(name)}: Knowledge Transfer</h2></div>
         <div class="bk-progress"><div class="bk-bar" style="width:${100 / ch.length}%"></div></div>
         <div class="bk">
           <nav class="bk-toc"><ol>${ch.map((c, i) =>

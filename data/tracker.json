@@ -555,95 +555,99 @@
    "blurb": "Asian Development Bank",
    "sections": [
     {
-     "title": "ADB KT book",
+     "title": "ADB Knowledge Transfer",
      "type": "book",
      "items": [
       {
-       "title": "The whole story",
+       "title": "Introduction",
        "icon": "🧭",
        "blocks": [
         {
          "type": "hero",
          "icon": "🏦",
-         "text": "ADB makes thousands of documents every day.",
-         "sub": "Some are too important to lose. This project keeps them safe."
+         "text": "ADB stands for the Asian Development Bank.",
+         "sub": "A regional development bank headquartered in Manila, with offices across Asia and the Pacific."
+        },
+        {
+         "type": "para",
+         "label": "The challenge",
+         "text": "ADB produces thousands of documents every day. Some must be kept as official records: protected, retained for a set period, and disposed of properly."
+        },
+        {
+         "type": "para",
+         "label": "The solution",
+         "text": "This project delivers EDRMS, the Electronic Document and Records Management System. AvePoint builds it on SharePoint and Microsoft 365."
         },
         {
          "type": "flow",
-         "label": "The life of an important document",
+         "label": "Record lifecycle",
          "items": [
           [
            "📄",
            "Document",
-           "someone creates it"
+           "Created by a user"
           ],
           [
            "🔒",
            "Record",
-           "locked as official"
+           "Declared and protected"
           ],
           [
            "⏳",
-           "Kept",
-           "for 5, 7, 10 years or forever"
+           "Retention",
+           "Kept for a defined period"
           ],
           [
            "🗑️",
-           "Disposed",
-           "when time is up"
+           "Disposition",
+           "Reviewed at end of period"
           ]
          ]
         },
         {
          "type": "analogy",
-         "text": "Think of EDRMS as a bank vault for paperwork. You put a document in, it gets a lock and a timer. Nobody can change it until the timer ends."
+         "text": "In short: once a document is declared a record, it cannot be edited or deleted until its retention period ends."
         },
         {
          "type": "flow",
-         "label": "Who makes it happen",
+         "label": "Project parties",
          "items": [
           [
            "🗂️",
            "RAC",
-           "asks for it"
+           "Defines requirements"
           ],
           [
            "🛠️",
            "AvePoint",
-           "builds it"
+           "Designs and builds"
           ],
           [
            "🧪",
            "ITD",
-           "tests it"
+           "Tests and verifies"
           ],
           [
-           "👩‍💼",
-           "ADB users",
-           "use it"
+           "👥",
+           "ADB Users",
+           "Use the system"
           ]
          ]
         },
         {
-         "type": "takeaway",
-         "text": "EDRMS turns ADB documents into protected records. It's built in small releases, one feature at a time."
-        },
-        {
          "type": "video",
-         "name": "Part 1: Introduction",
+         "name": "Part 1, Introduction",
          "src": "videos/EDRMS_KT_Part1_Introduction.mp4"
         }
        ]
       },
       {
-       "title": "Words you'll hear",
+       "title": "Key Terms",
        "icon": "💬",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🗄️",
-         "text": "It's just a filing room.",
-         "sub": "Every word below maps to something in a real office."
+         "type": "intro",
+         "text": "Before going further, these are the terms used throughout the project."
         },
         {
          "type": "cards",
@@ -651,163 +655,147 @@
           [
            "🏢",
            "Site",
-           "The office building. A SharePoint site set up for records."
+           "A SharePoint site configured for records management (EDRMS compliant)."
           ],
           [
            "🗄️",
            "Library",
-           "A filing cabinet inside it. Folders are the drawers."
+           "A document library within a site. Folders organise it further."
           ],
           [
            "🔒",
            "Record",
-           "A document that's been locked. No edits, no delete."
+           "A document declared as official. It cannot be edited or deleted."
           ],
           [
            "✋",
-           "Declare",
-           "The act of locking it. Document → record."
+           "Declaration",
+           "The action that converts a document into a record."
           ],
           [
            "⏳",
            "Retention label",
-           "The timer: 5, 7, 10 years or permanent. The cabinet decides, not you."
+           "Defines how long a record is kept: 5, 7, 10 years or permanent. Assigned by the library."
           ],
           [
            "🏷️",
            "Sensitivity label",
-           "The 'confidential' stamp. Needed for Word/Excel, not for photos, videos or emails."
+           "Defines confidentiality. Required for Office documents; not required for images, video or email files."
           ],
           [
            "📦",
            "Physical counterpart",
-           "A paper copy exists too."
+           "Indicates that a paper copy of the record also exists."
           ],
           [
            "🗑️",
-           "Disposal",
-           "What happens when the timer runs out."
+           "Disposition",
+           "The process applied when a record's retention period ends."
           ]
          ]
-        },
-        {
-         "type": "takeaway",
-         "text": "Building → cabinet → locked file → timer. That's the whole vocabulary."
         }
        ]
       },
       {
-       "title": "Lock a document",
+       "title": "Declaring a Record",
        "icon": "🔐",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🖱️",
-         "text": "7 clicks from document to record.",
-         "sub": "What a user actually does in SharePoint."
+         "type": "intro",
+         "text": "With the terms in place, this is how a user declares a document as a record."
         },
         {
          "type": "steps",
          "items": [
           [
            "🏢",
-           "Go to the building",
-           "Open an EDRMS site."
+           "Open the site",
+           "Go to an EDRMS compliant SharePoint site."
           ],
           [
            "🗄️",
-           "Pick a cabinet",
-           "Choose a library and folder."
+           "Select the library",
+           "Choose the library, and a folder if required."
           ],
           [
            "⬆️",
-           "Put the file in",
-           "Create or upload it."
+           "Add the document",
+           "Create or upload the file."
           ],
           [
            "🏷️",
-           "Stamp it",
-           "Add a sensitivity label if it's Word/Excel."
+           "Apply a sensitivity label",
+           "Required for Office documents."
           ],
           [
            "✋",
-           "Declare it",
-           "… menu → Declare as record. Paper copy? Yes/No."
+           "Declare as record",
+           "Open the item menu and select Declare as record. Indicate whether a physical counterpart exists."
           ],
           [
            "✅",
            "Submit",
-           "A 🔒 lock icon appears."
+           "The file is declared and shows a lock icon."
           ],
           [
            "🔍",
-           "Double-check",
-           "Record Management Review view shows both labels."
+           "Verify",
+           "Use the Record Management Review view to confirm the retention and sensitivity labels."
           ]
          ]
-        },
-        {
-         "type": "takeaway",
-         "text": "See the lock icon? It's a record now."
         },
         {
          "type": "quiz",
          "items": [
           [
-           "Who decides how long a record is kept?",
-           "The library it's in. Each library has one retention label."
+           "What determines a record's retention period?",
+           "The library. Each library is mapped to one retention label."
           ],
           [
-           "Does a photo need a sensitivity label?",
-           "No. Photos, videos and emails don't."
+           "Does an image file require a sensitivity label?",
+           "No. Images, video and email files do not."
           ]
          ]
         }
        ]
       },
       {
-       "title": "The team",
+       "title": "Roles and Responsibilities",
        "icon": "🤝",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🏠",
-         "text": "Like building a house.",
-         "sub": "An owner, a builder, and an inspector."
+         "type": "intro",
+         "text": "Three parties deliver EDRMS. Each has a defined role."
         },
         {
          "type": "cards",
          "items": [
           [
            "🗂️",
-           "RAC = the owner",
-           "ADB's records team. Says what they want, approves it, tries it out (UAT)."
+           "RAC",
+           "ADB's records team. Owns the requirements, signs off the backlog and performs User Acceptance Testing (UAT)."
           ],
           [
            "🛠️",
-           "AvePoint = the builder",
-           "Writes down the needs (BAs), builds it (devs), checks own work first (QA)."
+           "AvePoint",
+           "Delivery partner. Business analysts document requirements, developers build each release, and AvePoint QA tests it first."
           ],
           [
            "🧪",
-           "ITD = the inspector",
-           "ADB's IT. Their TCS QA team tests every release (SIT) and checks it live."
+           "ITD",
+           "ADB's IT department. Its TCS QA team performs System Integration Testing (SIT) and production sanity testing."
           ]
          ]
-        },
-        {
-         "type": "takeaway",
-         "text": "RAC asks → AvePoint builds → ITD tests → RAC accepts."
         },
         {
          "type": "quiz",
          "items": [
           [
-           "Who tests it as a real user would?",
-           "RAC, in UAT."
+           "Who performs UAT?",
+           "RAC."
           ],
           [
-           "Who's the inspector?",
+           "Who performs SIT?",
            "ITD's TCS QA team."
           ]
          ]
@@ -815,14 +803,12 @@
        ]
       },
       {
-       "title": "How we got here",
+       "title": "Release History",
        "icon": "🚀",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🧱",
-         "text": "One brick at a time.",
-         "sub": "Each release adds one new thing users can do."
+         "type": "intro",
+         "text": "EDRMS is delivered in releases. Each release adds one capability."
         },
         {
          "type": "timeline",
@@ -831,80 +817,74 @@
            "Apr 2025",
            "1.1",
            "🏗️",
-           "Foundation: sites, libraries, first records."
+           "Site and library creation, records declaration, Cloud Governance setup."
           ],
           [
            "Nov 2025",
-           "1.2",
+           "1.2 / 1.2.1",
            "🎬",
-           "Photos, videos, audio can be records."
+           "Multimedia records declaration. Native retention label option disabled."
           ],
           [
            "Jan 2026",
            "2026.1",
            "📚",
-           "Lock many files at once."
+           "Multiple records declaration."
           ],
           [
            "Mar 2026",
            "2026.2",
            "🏛️",
-           "Keep records in one central place."
+           "Centralized records declaration."
           ],
           [
            "Jun 2026",
            "2026.3",
            "📧",
-           "Lock emails straight from Outlook."
+           "Email records declaration from Outlook. Enhancement 2026.3.1 in progress."
           ],
           [
            "Dec 2026",
            "2026.4",
            "📊",
-           "Utilization Report. ← we are here"
+           "EDRMS Utilization Report. Current release"
           ],
           [
-           "Later",
-           "2026.5+",
+           "On hold",
+           "2026.5",
            "📦",
-           "Paper records, disposal, renewals…"
+           "Physical records management, followed by the agreed roadmap."
           ]
          ]
         },
         {
-         "type": "takeaway",
-         "text": "Store it → store more types → store faster → store email → now: measure how it's used."
-        },
-        {
          "type": "video",
-         "name": "Part 2: The Release Journey",
+         "name": "Part 2, The Release Journey",
          "src": "videos/EDRMS_KT_Part2_The_Release_Journey.mp4"
         }
        ]
       },
       {
-       "title": "How a release is made",
+       "title": "Release Delivery Process",
        "icon": "⚙️",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🏠",
-         "text": "Plan it. Build it. Inspect it. Move in.",
-         "sub": "Every release follows the same 4 stages."
+         "type": "intro",
+         "text": "Every release follows the same four stages: Plan, Build, Test, Go Live."
         },
         {
          "type": "flow",
-         "label": "The 4 stages",
+         "label": "Stages",
          "items": [
           [
            "📝",
            "Plan",
-           "agree what to build"
+           "Agree the scope"
           ],
           [
            "🛠️",
            "Build",
-           "write the code"
+           "Develop the release"
           ],
           [
            "🧪",
@@ -913,8 +893,8 @@
           ],
           [
            "🚀",
-           "Go live",
-           "approve, release, watch"
+           "Go Live",
+           "Approve and deploy"
           ]
          ]
         },
@@ -924,82 +904,85 @@
           [
            "📝",
            "Plan",
-           "RAC's needs → workshop → user stories in ADO → RAC signs off."
+           "Requirements from RAC, feasibility, workshop, user stories in Azure DevOps (ADO), backlog sign-off."
           ],
           [
            "🛠️",
            "Build",
-           "Devs build it. AvePoint QA tests first."
+           "Development, then AvePoint QA and test case preparation."
           ],
           [
            "🧪",
            "Test",
-           "SIT by ITD. UAT by RAC. Bugs fixed along the way."
+           "SIT by ITD, UAT by RAC, UAT completion report."
           ],
           [
            "🚀",
-           "Go live",
-           "CAB approves → deploy → quick live check → hypercare."
+           "Go Live",
+           "Change Advisory Board (CAB) approval, production deployment, sanity testing, hypercare."
           ]
          ]
         },
         {
          "type": "analogy",
-         "text": "Every sign-off is a locked gate. You can't open the next gate until the one before is closed. That's why releases rarely break."
+         "text": "In short: each sign-off is a gate. A release proceeds only when the previous gate is closed."
         },
         {
          "type": "quiz",
          "items": [
           [
-           "What is CAB?",
-           "Change Advisory Board. Must approve before anything goes live."
+           "What is the CAB?",
+           "The Change Advisory Board. It approves changes before production deployment."
           ],
           [
            "What is hypercare?",
-           "Close watch right after go-live. Quick fixes = hotfixes."
+           "A period of close monitoring after go-live. Fixes released in this period are hotfixes."
           ]
          ]
         },
         {
          "type": "video",
-         "name": "Part 3: How A Release Is Delivered",
+         "name": "Part 3, How A Release Is Delivered",
          "src": "videos/EDRMS_KT_Part3_How_A_Release_Is_Delivered.mp4"
         }
        ]
       },
       {
-       "title": "The current job",
+       "title": "Current Release: EDRMS Utilization Report",
        "icon": "📊",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "📈",
-         "text": "Is ADB actually using EDRMS?",
-         "sub": "Release 2026.4, the Utilization Report, answers that."
+         "type": "intro",
+         "text": "The release now in progress is 2026.4, the EDRMS Utilization Report."
+        },
+        {
+         "type": "para",
+         "label": "Purpose",
+         "text": "The report shows how ADB departments are using EDRMS, so RAC and ITD can track adoption."
         },
         {
          "type": "flow",
-         "label": "How the report works",
+         "label": "Data flow",
          "items": [
           [
            "🗃️",
-           "Records data",
-           "from EDRMS database"
+           "EDRMS database",
+           "Declared records"
           ],
           [
            "⚙️",
            "Reporting tables",
-           "cleaned and joined"
+           "Prepared data"
           ],
           [
            "📊",
            "Power BI",
-           "dashboards"
+           "Dashboards"
           ],
           [
            "👀",
-           "RAC & ITD",
-           "see who uses it"
+           "RAC and ITD",
+           "Review adoption"
           ]
          ]
         },
@@ -1008,101 +991,104 @@
          "items": [
           [
            "🌐",
-           "Bank-wide",
-           "The whole bank at a glance."
+           "Bank-wide Oversight",
+           "Bank-wide overview."
           ],
           [
            "🏢",
-           "Department",
-           "One department up close."
+           "Department Insights",
+           "One department in detail."
           ],
           [
            "📁",
-           "Project",
+           "Project Insights",
            "One project's records."
           ],
           [
            "🗂️",
-           "File plan",
-           "Records by category."
+           "Institutional File Plan",
+           "Records by file plan category."
           ],
           [
            "⏳",
-           "Retention",
-           "What's kept, what's due for disposal."
+           "Retention and Disposal",
+           "Retention status and disposal."
           ],
           [
            "📦",
-           "Archive",
-           "Paper holdings (not specified yet)."
+           "Records and Archive Holdings",
+           "Physical holdings. Not yet specified."
           ]
          ]
         },
         {
          "type": "analogy",
-         "text": "The catch: EDRMS only remembers locked records. It has no list of documents that were never locked. So 'what % is locked?' needs a new data source."
+         "text": "Note: the EDRMS database holds declared records only. Undeclared documents are not stored, so percentage measures require an additional data source."
         },
         {
          "type": "timeline",
          "items": [
           [
-           "24 Nov",
+           "24 Nov to 4 Dec 2026",
            "UAT",
            "🧪",
-           "RAC tests it."
+           "User Acceptance Testing by RAC."
           ],
           [
            "11 Dec 2026",
-           "Go live",
+           "Go Live",
            "🚀",
-           "Planned release."
+           "Planned production deployment."
           ]
          ]
         }
        ]
       },
       {
-       "title": "One-page recap",
+       "title": "Summary",
        "icon": "⭐",
        "blocks": [
         {
-         "type": "hero",
-         "icon": "🎉",
-         "text": "You now know the project.",
-         "sub": "Here it is in six lines."
+         "type": "intro",
+         "text": "The key points of this guide, on one page."
         },
         {
          "type": "steps",
          "items": [
           [
+           "🏦",
+           "ADB",
+           "The Asian Development Bank, Manila."
+          ],
+          [
            "🔒",
-           "What",
-           "EDRMS locks important ADB documents as records."
+           "EDRMS",
+           "Declares important ADB documents as protected records."
           ],
           [
            "⏳",
-           "How long",
-           "The library sets the timer."
+           "Retention",
+           "Set by the library the record is stored in."
           ],
           [
-           "🖱️",
-           "How",
-           "7 clicks: site → library → upload → label → declare → submit → check."
+           "✋",
+           "Declaration",
+           "Site, library, upload, label, declare, submit, verify."
           ],
           [
            "🤝",
-           "Who",
-           "RAC asks, AvePoint builds, ITD tests."
+           "Roles",
+           "RAC defines, AvePoint builds, ITD tests."
           ],
           [
            "⚙️",
-           "Process",
-           "Plan → Build → Test → Go live. Every gate signed."
+           "Delivery",
+           "Plan, Build, Test, Go Live, with a sign-off at each gate."
           ],
           [
            "📊",
-           "Now",
-           "Utilization Report, live 11 Dec 2026."
+           "Current release",
+           "2026.4 EDRMS Utilization Report, go-live 11 Dec 2026."
           ]
          ]
         }
