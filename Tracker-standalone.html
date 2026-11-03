@@ -815,6 +815,10 @@ body[data-signed-in="no"] .topbar{display:none}
   .bk-arrow { transform: rotate(90deg); flex-basis: 100%; text-align: center; } .bk-flow { flex-direction: column; } }
 .bk-intro { font-size: 1.15rem; opacity: .8; margin: 0; }
 .bk-para p { margin: 0; font-size: 1.08rem; }
+.bk-editnote { padding: 10px 14px; border-radius: 10px; margin: 0 0 14px; background: rgba(59,130,246,.12); border-left: 4px solid #3b82f6; }
+.bk-editing .bk-t { outline: 1px dashed rgba(59,130,246,.6); outline-offset: 2px; border-radius: 3px; cursor: text; }
+.bk-editing .bk-t:focus { outline: 2px solid #3b82f6; background: rgba(59,130,246,.08); }
+.bk-editing .bk-sec, .bk-editing .bk-node, .bk-editing .bk-card, .bk-editing li, .bk-editing .bk-arrow { animation: none !important; }
 
 </style>
 </head>
@@ -1072,6 +1076,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
       // their artifacts seeded from the workbook. Restoring artifacts without
       // it lets the seed run a second time and duplicate every one of them.
       "tracker.seeded",
+      "tracker.bookEdits",   // wording edited in place in the KT guide
     ],
     settings: [
       "tracker.theme",
@@ -8438,44 +8443,60 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
     return p && (p.sections || []).find((s) => s.type === "book" && s.items && s.items.length);
   }
 
+  /* ---------- editing the guide in place ----------
+     Every text in the guide carries data-bkpath, its address in the chapter
+     data ("0.title", "0.2.items.1.2"). In edit mode those become editable;
+     what you type is kept under BOOK_EDITS as { path: text } and laid over
+     the workbook text on every render. It is in KEYS.data, so it is in the
+     backup and undoable. Only text changes: layout, icons and videos do not. */
+  const BOOK_EDITS = "tracker.bookEdits";
+  let bookEditing = false;
+  const bookEdits = () => window.TrackerStore.get(BOOK_EDITS, {}) || {};
+  let edBase = "";
+  const T = (path, val) => {
+    const full = edBase + path, ov = bookEdits()[full];
+    return `<span class="bk-t" data-bkpath="${esc(full)}">${esc(ov ?? val ?? "")}</span>`;
+  };
+
   /* One chapter is a list of blocks. Each block animates in on its own
      delay (--d), so a page builds itself up rather than appearing at once. */
-  function blockHtml(b) {
+  function blockHtml(b, P) {
     let k = 0;
     const d = () => `style="--d:${k++}"`;
+    const it = (j, f, v) => T(`${P}.items.${j}.${f}`, v);
     switch (b.type) {
       case "hero": return `<div class="bk-hero"><div class="bk-hero-icon">${esc(b.icon)}</div>
-          <div><div class="bk-hero-text">${esc(b.text)}</div>${b.sub ? `<div class="bk-hero-sub">${esc(b.sub)}</div>` : ""}</div></div>`;
-      case "flow": return `<div class="bk-block">${b.label ? `<div class="bk-label">${esc(b.label)}</div>` : ""}
+          <div><div class="bk-hero-text">${T(P + ".text", b.text)}</div>${b.sub ? `<div class="bk-hero-sub">${T(P + ".sub", b.sub)}</div>` : ""}</div></div>`;
+      case "flow": return `<div class="bk-block">${b.label ? `<div class="bk-label">${T(P + ".label", b.label)}</div>` : ""}
           <div class="bk-flow">${b.items.map(([ic, t, s2], j) =>
             `${j ? `<div class="bk-arrow" ${d()}>➜</div>` : ""}<div class="bk-node" ${d()}><div class="bk-node-icon">${esc(ic)}</div>
-             <b>${esc(t)}</b><span>${esc(s2)}</span></div>`).join("")}</div></div>`;
-      case "cards": return `<div class="bk-cards">${b.items.map(([ic, t, s2]) =>
-          `<div class="bk-card" ${d()}><div class="bk-card-icon">${esc(ic)}</div><b>${esc(t)}</b><span>${esc(s2)}</span></div>`).join("")}</div>`;
+             <b>${it(j, 1, t)}</b><span>${it(j, 2, s2)}</span></div>`).join("")}</div></div>`;
+      case "cards": return `<div class="bk-cards">${b.items.map(([ic, t, s2], j) =>
+          `<div class="bk-card" ${d()}><div class="bk-card-icon">${esc(ic)}</div><b>${it(j, 1, t)}</b><span>${it(j, 2, s2)}</span></div>`).join("")}</div>`;
       case "steps": return `<ol class="bk-steplist">${b.items.map(([ic, t, s2], j) =>
           `<li ${d()}><span class="bk-num">${j + 1}</span><span class="bk-step-icon">${esc(ic)}</span>
-           <div><b>${esc(t)}</b><span>${esc(s2)}</span></div></li>`).join("")}</ol>`;
-      case "timeline": return `<ol class="bk-timeline">${b.items.map(([w, r, ic, t]) =>
+           <div><b>${it(j, 1, t)}</b><span>${it(j, 2, s2)}</span></div></li>`).join("")}</ol>`;
+      case "timeline": return `<ol class="bk-timeline">${b.items.map(([w, r, ic, t], j) =>
           `<li ${d()}${/Current release/.test(t) ? ' class="now"' : ""}><span class="bk-dot">${esc(ic)}</span>
-           <div><span class="bk-when">${esc(w)} · <b>${esc(r)}</b></span><span>${esc(t)}</span></div></li>`).join("")}</ol>`;
-      case "analogy": return `<div class="bk-analogy"><span>💡</span><p>${esc(b.text)}</p></div>`;
-      case "intro": return `<p class="bk-intro">${esc(b.text)}</p>`;
-      case "para": return `<div class="bk-para">${b.label ? `<div class="bk-label">${esc(b.label)}</div>` : ""}<p>${esc(b.text)}</p></div>`;
-      case "takeaway": return `<div class="bk-takeaway"><div class="bk-label">Remember this</div><p>${esc(b.text)}</p></div>`;
-      case "quiz": return `<div class="bk-quiz"><div class="bk-label">Review questions</div>${b.items.map(([q, a]) =>
-          `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`;
-      case "video": return `<div class="bk-video"><div class="bk-label">🎬 Video: ${esc(b.name)}</div>
+           <div><span class="bk-when">${it(j, 0, w)} · <b>${it(j, 1, r)}</b></span>${it(j, 3, t)}</div></li>`).join("")}</ol>`;
+      case "analogy": return `<div class="bk-analogy"><span>💡</span><p>${T(P + ".text", b.text)}</p></div>`;
+      case "intro": return `<p class="bk-intro">${T(P + ".text", b.text)}</p>`;
+      case "para": return `<div class="bk-para">${b.label ? `<div class="bk-label">${T(P + ".label", b.label)}</div>` : ""}<p>${T(P + ".text", b.text)}</p></div>`;
+      case "takeaway": return `<div class="bk-takeaway"><div class="bk-label">Key point</div><p>${T(P + ".text", b.text)}</p></div>`;
+      case "quiz": return `<div class="bk-quiz"><div class="bk-label">Review questions</div>${b.items.map(([q, a], j) =>
+          `<details${bookEditing ? " open" : ""}><summary>${it(j, 0, q)}</summary><p>${it(j, 1, a)}</p></details>`).join("")}</div>`;
+      case "video": return `<div class="bk-video"><div class="bk-label">🎬 Video: ${T(P + ".name", b.name)}</div>
           <video controls playsinline preload="metadata" src="${esc(b.src)}"></video></div>`;
       default: return "";
     }
   }
 
-  function chapterHtml(c, i, n) {
+  function chapterHtml(c, i, n, cur) {
     return `
-      <article class="bk-page${i ? "" : " bk-in"}" data-bkpage="${i}"${i ? " hidden" : ""}>
+      <article class="bk-page${i === cur ? " bk-in" : ""}" data-bkpage="${i}"${i === cur ? "" : " hidden"}>
         <div class="bk-count">${esc(c.icon || "")} Chapter ${i + 1} of ${n}</div>
-        <h3 class="bk-title">${esc(c.title)}</h3>
-        ${(c.blocks || []).map((b, j) => `<section class="bk-sec" style="--s:${j}">${blockHtml(b)}</section>`).join("")}
+        <h3 class="bk-title">${T(i + ".title", c.title)}</h3>
+        ${(c.blocks || []).map((b, j) => `<section class="bk-sec" style="--s:${j}">${blockHtml(b, `${i}.${j}`)}</section>`).join("")}
         <div class="bk-nav">
           <button class="btn" data-bkgo="${i - 1}"${i ? "" : " disabled"}>← Back</button>
           ${i < n - 1
@@ -8485,25 +8506,73 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
       </article>`;
   }
 
+  let bookPage = 0;
   function bookView(name, sec) {
-    const ch = sec.items;
+    const ch = sec.items, ov = bookEdits();
+    edBase = `${slug(name)}:`;
+    const title = (i) => ov[`${edBase}${i}.title`] ?? ch[i].title;
+    const cur = Math.min(bookPage, ch.length - 1);
+    const edited = Object.keys(ov).some((k) => k.startsWith(edBase));
     return `
       <div class="opened">
-        <div class="sectionhead"><h2 class="page sub">${esc(name)}: Knowledge Transfer</h2></div>
-        <div class="bk-progress"><div class="bk-bar" style="width:${100 / ch.length}%"></div></div>
-        <div class="bk">
+        <div class="sectionhead">
+          <h2 class="page sub">${esc(name)}: Knowledge Transfer</h2>
+          <div class="sectiontools">
+            ${bookEditing && edited ? `<button class="btn" data-bkreset>Restore original text</button>` : ""}
+            <button class="btn${bookEditing ? " primary" : ""}" data-bkedit>${bookEditing ? "✓ Done editing" : "✎ Edit text"}</button>
+          </div>
+        </div>
+        ${bookEditing ? `<div class="bk-editnote">Click any text to change it. Changes save as you type and stay in this browser.</div>` : ""}
+        <div class="bk-progress"><div class="bk-bar" style="width:${((cur + 1) / ch.length) * 100}%"></div></div>
+        <div class="bk${bookEditing ? " bk-editing" : ""}">
           <nav class="bk-toc"><ol>${ch.map((c, i) =>
-            `<li><button data-bkgo="${i}" aria-current="${i === 0}"><span>${esc(c.icon || "")}</span>${esc(c.title)}</button></li>`).join("")}</ol></nav>
-          <div class="bk-body">${ch.map((c, i) => chapterHtml({ ...c, next: ch[i + 1] ? ch[i + 1].title + " " : "" }, i, ch.length)).join("")}</div>
+            `<li><button data-bkgo="${i}" aria-current="${i === cur}"><span>${esc(c.icon || "")}</span>${esc(title(i))}</button></li>`).join("")}</ol></nav>
+          <div class="bk-body">${ch.map((c, i) => chapterHtml({ ...c, next: ch[i + 1] ? title(i + 1) + " " : "" }, i, ch.length, cur)).join("")}</div>
         </div>
       </div>`;
   }
+
+  const bookRerender = () => { if (window.TrackerRender) window.TrackerRender(); };
+  const setEditable = () => document.querySelectorAll(".bk-t").forEach((el) => {
+    el.contentEditable = bookEditing ? "plaintext-only" : "false";
+    if (bookEditing && el.contentEditable !== "plaintext-only") el.contentEditable = "true";
+  });
+  new MutationObserver(() => { if (bookEditing && document.querySelector(".bk-t:not([contenteditable])")) setEditable(); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest && e.target.closest("[data-bkedit]")) { bookEditing = !bookEditing; bookRerender(); setEditable(); return; }
+    if (e.target.closest && e.target.closest("[data-bkreset]")) {
+      if (!confirm("Restore the original text of this guide? Your edits to it will be removed.")) return;
+      const ov = bookEdits();
+      for (const k of Object.keys(ov)) if (k.startsWith(edBase)) delete ov[k];
+      window.TrackerStore.set(BOOK_EDITS, ov); bookRerender(); setEditable(); return;
+    }
+    // In edit mode a click on a question edits it rather than folding it.
+    if (bookEditing && e.target.closest && e.target.closest("summary .bk-t")) e.preventDefault();
+  });
+  // Save on every keystroke, without re-rendering, so the caret stays put.
+  document.addEventListener("input", (e) => {
+    const el = e.target.closest && e.target.closest(".bk-t");
+    if (!el || !bookEditing) return;
+    const ov = bookEdits();
+    ov[el.dataset.bkpath] = el.textContent.replace(/\s+/g, " ").trim();
+    window.TrackerStore.set(BOOK_EDITS, ov);
+  });
+  // A space or Enter inside a question must not toggle it; Enter must not add lines.
+  document.addEventListener("keydown", (e) => {
+    const el = e.target.closest && e.target.closest(".bk-t");
+    if (!el || !bookEditing) return;
+    if (e.key === "Enter") { e.preventDefault(); el.blur(); }
+    if (e.key === " " && el.closest("summary")) { e.stopPropagation(); }
+  }, true);
 
   document.addEventListener("click", (e) => {
     const b = e.target.closest && e.target.closest("[data-bkgo]");
     if (!b || b.disabled) return;
     const i = Number(b.dataset.bkgo);
     const pages = document.querySelectorAll(".bk-page");
+    if (i >= 0 && i < pages.length) bookPage = i;
     if (i < 0 || i >= pages.length) return;
     pages.forEach((pg) => {
       const on = Number(pg.dataset.bkpage) === i;

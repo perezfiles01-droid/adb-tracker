@@ -108,6 +108,7 @@
       // their artifacts seeded from the workbook. Restoring artifacts without
       // it lets the seed run a second time and duplicate every one of them.
       "tracker.seeded",
+      "tracker.bookEdits",   // wording edited in place in the KT guide
     ],
     settings: [
       "tracker.theme",

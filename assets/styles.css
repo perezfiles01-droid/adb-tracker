@@ -805,3 +805,7 @@ body[data-signed-in="no"] .topbar{display:none}
   .bk-arrow { transform: rotate(90deg); flex-basis: 100%; text-align: center; } .bk-flow { flex-direction: column; } }
 .bk-intro { font-size: 1.15rem; opacity: .8; margin: 0; }
 .bk-para p { margin: 0; font-size: 1.08rem; }
+.bk-editnote { padding: 10px 14px; border-radius: 10px; margin: 0 0 14px; background: rgba(59,130,246,.12); border-left: 4px solid #3b82f6; }
+.bk-editing .bk-t { outline: 1px dashed rgba(59,130,246,.6); outline-offset: 2px; border-radius: 3px; cursor: text; }
+.bk-editing .bk-t:focus { outline: 2px solid #3b82f6; background: rgba(59,130,246,.08); }
+.bk-editing .bk-sec, .bk-editing .bk-node, .bk-editing .bk-card, .bk-editing li, .bk-editing .bk-arrow { animation: none !important; }
