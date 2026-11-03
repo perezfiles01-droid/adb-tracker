@@ -468,28 +468,47 @@
     return p && (p.sections || []).find((s) => s.type === "book" && s.items && s.items.length);
   }
 
+  /* One chapter is a list of blocks. Each block animates in on its own
+     delay (--d), so a page builds itself up rather than appearing at once. */
+  function blockHtml(b) {
+    let k = 0;
+    const d = () => `style="--d:${k++}"`;
+    switch (b.type) {
+      case "hero": return `<div class="bk-hero"><div class="bk-hero-icon">${esc(b.icon)}</div>
+          <div><div class="bk-hero-text">${esc(b.text)}</div>${b.sub ? `<div class="bk-hero-sub">${esc(b.sub)}</div>` : ""}</div></div>`;
+      case "flow": return `<div class="bk-block">${b.label ? `<div class="bk-label">${esc(b.label)}</div>` : ""}
+          <div class="bk-flow">${b.items.map(([ic, t, s2], j) =>
+            `${j ? `<div class="bk-arrow" ${d()}>➜</div>` : ""}<div class="bk-node" ${d()}><div class="bk-node-icon">${esc(ic)}</div>
+             <b>${esc(t)}</b><span>${esc(s2)}</span></div>`).join("")}</div></div>`;
+      case "cards": return `<div class="bk-cards">${b.items.map(([ic, t, s2]) =>
+          `<div class="bk-card" ${d()}><div class="bk-card-icon">${esc(ic)}</div><b>${esc(t)}</b><span>${esc(s2)}</span></div>`).join("")}</div>`;
+      case "steps": return `<ol class="bk-steplist">${b.items.map(([ic, t, s2], j) =>
+          `<li ${d()}><span class="bk-num">${j + 1}</span><span class="bk-step-icon">${esc(ic)}</span>
+           <div><b>${esc(t)}</b><span>${esc(s2)}</span></div></li>`).join("")}</ol>`;
+      case "timeline": return `<ol class="bk-timeline">${b.items.map(([w, r, ic, t]) =>
+          `<li ${d()}${/we are here/.test(t) ? ' class="now"' : ""}><span class="bk-dot">${esc(ic)}</span>
+           <div><span class="bk-when">${esc(w)} · <b>${esc(r)}</b></span><span>${esc(t)}</span></div></li>`).join("")}</ol>`;
+      case "analogy": return `<div class="bk-analogy"><span>💡</span><p>${esc(b.text)}</p></div>`;
+      case "takeaway": return `<div class="bk-takeaway"><div class="bk-label">Remember this</div><p>${esc(b.text)}</p></div>`;
+      case "quiz": return `<div class="bk-quiz"><div class="bk-label">Quick check: tap to reveal</div>${b.items.map(([q, a]) =>
+          `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>`;
+      case "video": return `<div class="bk-video"><div class="bk-label">🎬 Watch: ${esc(b.name)}</div>
+          <video controls playsinline preload="metadata" src="${esc(b.src)}"></video></div>`;
+      default: return "";
+    }
+  }
+
   function chapterHtml(c, i, n) {
-    const list = (xs) => `<ul class="bk-points">${xs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
     return `
-      <article class="bk-page" data-bkpage="${i}"${i ? " hidden" : ""}>
-        <div class="bk-count">Chapter ${i + 1} of ${n}</div>
+      <article class="bk-page${i ? "" : " bk-in"}" data-bkpage="${i}"${i ? " hidden" : ""}>
+        <div class="bk-count">${esc(c.icon || "")} Chapter ${i + 1} of ${n}</div>
         <h3 class="bk-title">${esc(c.title)}</h3>
-        ${c.lead ? `<p class="bk-lead">${esc(c.lead)}</p>` : ""}
-        ${c.steps ? `<ol class="bk-steps">${c.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}
-        ${c.terms ? `<dl class="bk-terms">${c.terms.map(([t, d]) =>
-            `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join("")}</dl>` : ""}
-        ${c.timeline ? `<ol class="bk-time">${c.timeline.map(([w, r, d]) =>
-            `<li><span class="bk-when">${esc(w)}</span><b>${esc(r)}</b><span>${esc(d)}</span></li>`).join("")}</ol>` : ""}
-        ${c.stages ? `<ol class="bk-stages">${c.stages.map(([t, d]) =>
-            `<li><b>${esc(t)}</b><span>${esc(d)}</span></li>`).join("")}</ol>` : ""}
-        ${c.points ? list(c.points) : ""}
-        ${c.video ? `<div class="bk-video"><div class="bk-label">Watch: ${esc(c.video.name)}</div>
-            <video controls playsinline preload="metadata" src="${esc(c.video.src)}"></video></div>` : ""}
-        ${c.quiz ? `<div class="bk-quiz"><div class="bk-label">Check yourself (tap to reveal)</div>${c.quiz.map(([q, a]) =>
-            `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>` : ""}
+        ${(c.blocks || []).map((b, j) => `<section class="bk-sec" style="--s:${j}">${blockHtml(b)}</section>`).join("")}
         <div class="bk-nav">
           <button class="btn" data-bkgo="${i - 1}"${i ? "" : " disabled"}>← Back</button>
-          <button class="btn primary" data-bkgo="${i + 1}"${i < n - 1 ? "" : " disabled"}>Next →</button>
+          ${i < n - 1
+            ? `<button class="btn primary" data-bkgo="${i + 1}">Next: ${esc(c.next || "")}→</button>`
+            : `<button class="btn primary" data-bkgo="0">↺ Start again</button>`}
         </div>
       </article>`;
   }
@@ -499,10 +518,11 @@
     return `
       <div class="opened">
         <div class="sectionhead"><h2 class="page sub">${esc(name)}: learn from scratch</h2></div>
+        <div class="bk-progress"><div class="bk-bar" style="width:${100 / ch.length}%"></div></div>
         <div class="bk">
           <nav class="bk-toc"><ol>${ch.map((c, i) =>
-            `<li><button data-bkgo="${i}" aria-current="${i === 0}">${esc(c.title)}</button></li>`).join("")}</ol></nav>
-          <div class="bk-body">${ch.map((c, i) => chapterHtml(c, i, ch.length)).join("")}</div>
+            `<li><button data-bkgo="${i}" aria-current="${i === 0}"><span>${esc(c.icon || "")}</span>${esc(c.title)}</button></li>`).join("")}</ol></nav>
+          <div class="bk-body">${ch.map((c, i) => chapterHtml({ ...c, next: ch[i + 1] ? ch[i + 1].title + " " : "" }, i, ch.length)).join("")}</div>
         </div>
       </div>`;
   }
@@ -516,11 +536,16 @@
     pages.forEach((pg) => {
       const on = Number(pg.dataset.bkpage) === i;
       pg.hidden = !on;
+      // Re-adding the class replays the build-up animation on every visit.
+      pg.classList.remove("bk-in");
+      if (on) { void pg.offsetWidth; pg.classList.add("bk-in"); }
       if (!on) pg.querySelectorAll("video").forEach((v) => v.pause());
     });
     document.querySelectorAll(".bk-toc [data-bkgo]").forEach((t) =>
       t.setAttribute("aria-current", String(Number(t.dataset.bkgo) === i)));
-    const top = document.querySelector(".bk");
+    const bar = document.querySelector(".bk-bar");
+    if (bar) bar.style.width = `${((i + 1) / pages.length) * 100}%`;
+    const top = document.querySelector(".bk-progress");
     if (top && b.closest(".bk-nav")) top.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
