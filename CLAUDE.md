@@ -34,6 +34,28 @@ itself the thing they asked to stop.
 
 **The live site:** https://perezfiles01-droid.github.io/adb-tracker/
 
+## Fast lane: content changes go live in about a minute
+
+Standing instruction from the repository owner, 3 November 2026: updates
+must reflect within minutes, "as fast as Floot". The full process below
+took about 30 minutes for a one-word change; the deploy itself takes 20
+seconds. So there are two lanes.
+
+**Fast lane** — wording, adding or removing content, labels, the ADB KT
+guide (`data/tracker.json`), colours, spacing, `CLAUDE.md` / docs:
+
+1. Edit, then `python3 scripts/build_standalone.py`.
+2. Run only `check_render.mjs` and `check_search.mjs` (under a minute).
+3. Commit and **push straight to `main`**. No branch, no pull request,
+   no waiting for Checks. Pages deploys in about 20 seconds.
+4. Confirm the Pages run for that SHA succeeded, tell the owner to hard
+   refresh. The full Checks run on `main` afterwards; if it goes red,
+   fixing it is the very next thing done.
+
+**Full lane** — the process below, unchanged — for anything that changes
+how the app behaves: JavaScript logic, new features, storage, sign-in,
+workflows. When unsure which lane, it is the full lane.
+
 ## What still stops, and why it is not the same thing
 
 Shipping is automatic. That is not a licence for everything. Stop and **state
