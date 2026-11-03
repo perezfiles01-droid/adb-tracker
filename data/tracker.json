@@ -546,6 +546,33 @@
      ]
     }
    ]
+  },
+  {
+   "id": "adb-kt",
+   "name": "ADB KT",
+   "edition": "adb",
+   "full": "ADB EDRMS knowledge transfer",
+   "blurb": "Knowledge transfer videos for the ADB EDRMS programme. Plays all three parts in order.",
+   "sections": [
+    {
+     "title": "KT videos",
+     "type": "videos",
+     "items": [
+      {
+       "name": "Part 1: Introduction",
+       "src": "videos/EDRMS_KT_Part1_Introduction.mp4"
+      },
+      {
+       "name": "Part 2: The Release Journey",
+       "src": "videos/EDRMS_KT_Part2_The_Release_Journey.mp4"
+      },
+      {
+       "name": "Part 3: How A Release Is Delivered",
+       "src": "videos/EDRMS_KT_Part3_How_A_Release_Is_Delivered.mp4"
+      }
+     ]
+    }
+   ]
   }
  ],
  "daily": [],
