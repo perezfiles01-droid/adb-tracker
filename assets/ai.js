@@ -576,7 +576,7 @@
           authorization: "Bearer " + key,
           // The browser sets Referer itself and will not let a page forge it,
           // so only the title is sent by hand.
-          "x-title": "Project Tracker",
+          "x-title": "ADB Tracker",
         },
         body: JSON.stringify({
           model: openrouter.model(),
@@ -631,7 +631,7 @@
       const res = await send(`${OPENROUTER_BASE}/chat/completions`, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + key,
-                   "x-title": "Project Tracker" },
+                   "x-title": "ADB Tracker" },
         body: JSON.stringify({
           model: openrouter.imageModel(),
           // Asked for explicitly, for the same reason Gemini's is: a model

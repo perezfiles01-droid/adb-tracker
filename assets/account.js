@@ -111,7 +111,7 @@
     return `<div class="acct-gate">
       <div class="acct-box">
         <div class="brand"><div class="dot">T</div>
-          <h1>Project Tracker<span>Sign in to see your own tracker</span></h1></div>
+          <h1>ADB Tracker<span>Sign in to see your own tracker</span></h1></div>
         ${notice ? `<div class="acct-notice">${esc(notice)}</div>` : ""}
         ${rows.join("")}
         <div class="acct-foot">

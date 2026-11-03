@@ -18,7 +18,7 @@ so this exposes site names and structure, not documents.
 
 ## Steps 1 & 2 — Repository and files: DONE
 
-`perezfiles01-droid/Project-Tracker` exists and I pushed every file to `main`
+`perezfiles01-droid/adb-tracker` exists and I pushed every file to `main`
 for you. Nothing to upload by hand.
 
 ## Step 3 — Turn on Pages
@@ -35,7 +35,7 @@ is enough. The workflow in `.github/workflows/pages.yml` takes over.
 Open the **Actions** tab. A run called *Deploy site to GitHub Pages* starts
 within a few seconds and takes about a minute. Green tick = live.
 
-Your URL: **https://perezfiles01-droid.github.io/Project-Tracker/**
+Your URL: **https://perezfiles01-droid.github.io/adb-tracker/**
 
 It also appears back on Settings → Pages once the first deploy finishes.
 
@@ -58,7 +58,7 @@ https://perezfiles01-droid.github.io
 
 ## Step 6 — Connect Drive
 
-1. Open <https://perezfiles01-droid.github.io/Project-Tracker/>
+1. Open <https://perezfiles01-droid.github.io/adb-tracker/>
 2. Sidebar → **Settings** → paste the **Client ID** → **Save**
 3. Sidebar → **Google Drive** → **Connect Google Drive** → pick your account
 4. On the "Google hasn't verified this app" screen: **Advanced → Go to Tracker

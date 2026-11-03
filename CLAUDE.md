@@ -32,7 +32,7 @@ and, when asked once too often:
 choice.** Both were authorised once, for every future change. Asking again is
 itself the thing they asked to stop.
 
-**The live site:** https://perezfiles01-droid.github.io/Project-Tracker/
+**The live site:** https://perezfiles01-droid.github.io/adb-tracker/
 
 ## What still stops, and why it is not the same thing
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Project Tracker (standalone) — BA project links &amp; documents</title>
+<title>ADB Tracker (standalone) — BA project links &amp; documents</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="description" content="Central index of tracking links, sites and documents for the GLASS and EDRMS ADB projects.">
 
@@ -741,7 +741,7 @@ body[data-signed-in="no"] .topbar{display:none}
   <aside class="sidebar">
     <div class="brand">
       <div class="dot">T</div>
-      <h1>Project Tracker<span id="brandSub">BA master index</span></h1>
+      <h1>ADB Tracker<span id="brandSub">BA master index</span></h1>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="side-foot">
@@ -894,7 +894,12 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
      Same database and same object store, so nothing already saved moves or is
      re-keyed: an attachment written by the previous version is read by this
      one without migration. */
-  const BLOB_DB = "tracker-files", BLOB_STORE = "blobs";
+  /* ADB Tracker is a clone served from the same github.io origin as Project
+     Tracker, so both share one localStorage and one IndexedDB. NS keeps this
+     copy's bytes apart. It applies only under /adb-tracker/, so the browser
+     checks (file:// and localhost) still see the plain key names. */
+  const NS = (typeof location !== "undefined" && /^\/adb-tracker(\/|$)/i.test(location.pathname)) ? "adb:" : "";
+  const BLOB_DB = NS + "tracker-files", BLOB_STORE = "blobs";
   const idb = () => new Promise((resolve, reject) => {
     const r = indexedDB.open(BLOB_DB, 1);
     r.onupgradeneeded = () => r.result.createObjectStore(BLOB_STORE);
@@ -1067,7 +1072,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
      offline standalone file and the moment before sign-in, where there is no
      account to scope to and nothing is rendered anyway. */
   let scope = "";
-  const scoped = (key) => (scope ? key + "::" + scope : key);
+  const scoped = (key) => NS + (scope ? key + "::" + scope : key);
   const getScope = () => scope;
 
   /**
@@ -1097,7 +1102,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
      It lives here rather than in account.js because this file is the only
      one allowed to touch localStorage, and check_storage.mjs fails the build
      if that stops being true. */
-  const SESSION = "tracker.session";
+  const SESSION = NS + "tracker.session";
   const getSession = () => {
     try { return JSON.parse(localStorage.getItem(SESSION) || "null"); } catch { return null; }
   };
@@ -1446,7 +1451,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
    */
   async function importData(payload) {
     if (!payload || typeof payload !== "object" || payload.format !== "project-tracker-backup") {
-      throw new Error("That is not a Project Tracker backup file.");
+      throw new Error("That is not a Tracker backup file.");
     }
     const keys = payload.keys;
     if (!keys || typeof keys !== "object") throw new Error("The backup has no data in it.");
@@ -1969,7 +1974,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
     return `<div class="acct-gate">
       <div class="acct-box">
         <div class="brand"><div class="dot">T</div>
-          <h1>Project Tracker<span>Sign in to see your own tracker</span></h1></div>
+          <h1>ADB Tracker<span>Sign in to see your own tracker</span></h1></div>
         ${notice ? `<div class="acct-notice">${esc(notice)}</div>` : ""}
         ${rows.join("")}
         <div class="acct-foot">
@@ -2649,7 +2654,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
           authorization: "Bearer " + key,
           // The browser sets Referer itself and will not let a page forge it,
           // so only the title is sent by hand.
-          "x-title": "Project Tracker",
+          "x-title": "ADB Tracker",
         },
         body: JSON.stringify({
           model: openrouter.model(),
@@ -2704,7 +2709,7 @@ window.TRACKER_DATA = {"generatedAt": "2026-09-03 05:25 UTC", "source": "BA_Mast
       const res = await send(`${OPENROUTER_BASE}/chat/completions`, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + key,
-                   "x-title": "Project Tracker" },
+                   "x-title": "ADB Tracker" },
         body: JSON.stringify({
           model: openrouter.imageModel(),
           // Asked for explicitly, for the same reason Gemini's is: a model

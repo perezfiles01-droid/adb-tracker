@@ -19,7 +19,12 @@
      Same database and same object store, so nothing already saved moves or is
      re-keyed: an attachment written by the previous version is read by this
      one without migration. */
-  const BLOB_DB = "tracker-files", BLOB_STORE = "blobs";
+  /* ADB Tracker is a clone served from the same github.io origin as Project
+     Tracker, so both share one localStorage and one IndexedDB. NS keeps this
+     copy's bytes apart. It applies only under /adb-tracker/, so the browser
+     checks (file:// and localhost) still see the plain key names. */
+  const NS = (typeof location !== "undefined" && /^\/adb-tracker(\/|$)/i.test(location.pathname)) ? "adb:" : "";
+  const BLOB_DB = NS + "tracker-files", BLOB_STORE = "blobs";
   const idb = () => new Promise((resolve, reject) => {
     const r = indexedDB.open(BLOB_DB, 1);
     r.onupgradeneeded = () => r.result.createObjectStore(BLOB_STORE);
@@ -192,7 +197,7 @@
      offline standalone file and the moment before sign-in, where there is no
      account to scope to and nothing is rendered anyway. */
   let scope = "";
-  const scoped = (key) => (scope ? key + "::" + scope : key);
+  const scoped = (key) => NS + (scope ? key + "::" + scope : key);
   const getScope = () => scope;
 
   /**
@@ -222,7 +227,7 @@
      It lives here rather than in account.js because this file is the only
      one allowed to touch localStorage, and check_storage.mjs fails the build
      if that stops being true. */
-  const SESSION = "tracker.session";
+  const SESSION = NS + "tracker.session";
   const getSession = () => {
     try { return JSON.parse(localStorage.getItem(SESSION) || "null"); } catch { return null; }
   };
@@ -571,7 +576,7 @@
    */
   async function importData(payload) {
     if (!payload || typeof payload !== "object" || payload.format !== "project-tracker-backup") {
-      throw new Error("That is not a Project Tracker backup file.");
+      throw new Error("That is not a Tracker backup file.");
     }
     const keys = payload.keys;
     if (!keys || typeof keys !== "object") throw new Error("The backup has no data in it.");
