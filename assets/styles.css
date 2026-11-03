@@ -822,3 +822,12 @@ body[data-signed-in="no"] .topbar{display:none}
 .faqsoon { aspect-ratio: 16 / 9; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-items: center; align-content: center; gap: 6px;
   background: rgba(128,128,128,.06); }
 .faqsoon span { font-size: 2rem; } .faqsoon em { font-style: normal; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; opacity: .6; }
+.faqhowlist { display: grid; gap: 18px; }
+.faqhow { border-top: 1px solid var(--line); padding-top: 16px; }
+.faqhow:first-child { border-top: 0; padding-top: 0; }
+.faqhow-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+.faqhow-icon { font-size: 1.8rem; }
+.faqhow h4 { margin: 0; font-size: 1.1rem; } .faqhow-head p { margin: 2px 0 0; opacity: .75; }
+.faqhow .bk-steplist li { grid-template-columns: 34px 0 1fr; }
+.faqvid { margin-top: 12px; max-width: 560px; }
+.faqvid video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 16 / 9; }
