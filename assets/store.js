@@ -714,6 +714,57 @@
     if (e.target.closest("#openBackup")) openBackupDialog();
   });
 
+  /* ---------- one-time site password ----------
+     Asked by the owner, 3 Nov 2026: the live ADB site asks for a password
+     once per computer, then never again. Only under /adb-tracker/
+     (TRACKER_CLEAN), so the browser checks never meet it.
+
+     This is a curtain, not a lock. The site is static and public: the page,
+     its data and the videos are all fetchable without it, and anyone who
+     reads this file can get past it. It keeps casual visitors out, nothing
+     more. Only a SHA-256 of the password is kept here.
+
+     Deliberately unscoped, like the session pointer: it is about this
+     computer, not about whichever account later signs in. */
+  const UNLOCK = NS + "tracker.unlocked";
+  const PASS_SHA256 = "7e16a033d8a9e716f5572ef0b23b296050bcf72c23a67c1198b995de62701b20";
+  const isUnlocked = () => { try { return localStorage.getItem(UNLOCK) === "1"; } catch { return true; } };
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  function showGate() {
+    const el = document.createElement("div");
+    el.id = "sitegate";
+    el.innerHTML = `
+      <form class="gatebox" autocomplete="off">
+        <div class="gatelogo">🔒</div>
+        <h1>Project Knowledge</h1>
+        <p>Enter the password to open this site. You will only be asked once on this computer.</p>
+        <input type="password" aria-label="Password" placeholder="Password" required autofocus>
+        <div class="gateerr" role="alert"></div>
+        <button class="btn primary" type="submit">Open</button>
+      </form>`;
+    document.documentElement.appendChild(el);
+    document.documentElement.classList.add("gated");
+    const input = el.querySelector("input");
+    setTimeout(() => input.focus(), 50);
+    el.querySelector("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if ((await sha256(input.value.trim().toLowerCase())) === PASS_SHA256) {
+        try { localStorage.setItem(UNLOCK, "1"); } catch { /* still opens for this visit */ }
+        document.documentElement.classList.remove("gated");
+        el.remove();
+      } else {
+        el.querySelector(".gateerr").textContent = "That password is not correct.";
+        input.select();
+      }
+    });
+  }
+  if (window.TRACKER_CLEAN && !isUnlocked()) {
+    if (document.body) showGate(); else document.addEventListener("DOMContentLoaded", showGate);
+  }
+
   window.TrackerStore = { KEYS, ALL, get, set, getText, setText, remove,
                           setScope, getScope, getSession, setSession, quietSet,
                           exportData, exportFile, backupStats, importData, saveToFile, restoreFromFile, openBackupDialog,
