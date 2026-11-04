@@ -947,11 +947,6 @@
          "icon": "📊",
          "text": "A single view of how ADB uses EDRMS.",
          "sub": "Earlier releases let users declare records. This release measures how well that is happening, bank-wide and by department."
-        },
-        {
-         "type": "video",
-         "name": "Release 2026.4, EDRMS Utilization Report",
-         "src": "videos/EDRMS_Release2026.4_KT_Video.mp4"
         }
        ]
       },
