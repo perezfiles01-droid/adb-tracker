@@ -143,6 +143,30 @@
      ]
     }
    ]
+  },
+  {
+   "question": "How to access the database?",
+   "videos": [
+    {
+     "name": "Connecting to the ADB jump host",
+     "icon": "🖥️",
+     "desc": "Web access to the jump host is blocked, so connect through the Windows App.",
+     "steps": [
+      [
+       "Install the Windows App",
+       "On Windows, download the Windows App from the Microsoft Store."
+      ],
+      [
+       "Sign in and open Apps",
+       "Sign in with your ADB account, then go to the Apps tab. The virtual machine (VM) is listed there."
+      ],
+      [
+       "Log in to the VM",
+       "Open the VM and log in with the credential password provided to you."
+      ]
+     ]
+    }
+   ]
   }
  ]
 }
