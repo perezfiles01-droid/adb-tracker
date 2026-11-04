@@ -602,7 +602,7 @@
         ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
         ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
         ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
-          <details class="faqq"${qi === 0 || E ? " open" : ""}>
+          <details class="faqq"${E ? " open" : ""}>
             <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
               ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
             <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
