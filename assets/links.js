@@ -582,6 +582,15 @@
   // A step's screenshots: a list now. Older data held one path as a string.
   const shotsOf = (st) => (Array.isArray(st[2]) ? st[2] : st[2] ? [st[2]] : []);
   let faqActive = "";
+  // Which questions are open. Kept across re-renders, so adding a step or a
+  // screenshot does not fold the question you are working in; everything
+  // starts closed, in view and in edit mode alike.
+  const faqOpen = new Set();
+  document.addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!d.classList || !d.classList.contains("faqq")) return;
+    if (d.open) faqOpen.add(+d.dataset.qi); else faqOpen.delete(+d.dataset.qi);
+  }, true);
   const imgSrc = (path) => (faqPending.has(path) ? faqPending.get(path) : path);
 
   function faqView(sec) {
@@ -602,7 +611,7 @@
         ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
         ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
         ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
-          <details class="faqq"${E ? " open" : ""}>
+          <details class="faqq" data-qi="${qi}"${faqOpen.has(qi) ? " open" : ""}>
             <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
               ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
             <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
@@ -721,8 +730,10 @@
     else {
       const q = faqDraft[ix[0]], v = q && q.videos && q.videos[ix[1]];
       const sure = (what) => confirm(`Delete this ${what}? It is removed for everyone when you publish.`);
-      if (a === "addq") faqDraft.push({ question: "New question", videos: [{ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] }] });
-      else if (a === "delq") { if (!sure("question")) return; faqDraft.splice(ix[0], 1); }
+      if (a === "addq") faqOpen.add(faqDraft.length), faqDraft.push({ question: "New question", videos: [{ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] }] });
+      else if (a === "delq") { if (!sure("question")) return; faqDraft.splice(ix[0], 1);
+        const kept = [...faqOpen].filter((i) => i !== ix[0]).map((i) => (i > ix[0] ? i - 1 : i));
+        faqOpen.clear(); kept.forEach((i) => faqOpen.add(i)); }
       else if (a === "addg") (q.videos = q.videos || []).push({ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] });
       else if (a === "delg") { if (!sure("guide")) return; q.videos.splice(ix[1], 1); }
       else if (a === "adds") (v.steps = v.steps || []).push(["Step title", "What to do."]);
@@ -750,7 +761,8 @@
   }, true);
   // Typing in the question must not open and close it.
   document.addEventListener("click", (e) => {
-    if (faqEditing && e.target.closest && e.target.closest("summary") && !e.target.closest("[data-faqact]")) e.preventDefault();
+    if (faqEditing && e.target.closest && e.target.closest("summary") &&
+        (e.target.closest("[data-faqf]") || e.target.closest("[data-faqact]"))) e.preventDefault();
   }, true);
   // Add images (from a file picker, a paste or a drop) to one step.
   async function faqAddShots(key, files) {
