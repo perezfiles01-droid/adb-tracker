@@ -828,7 +828,9 @@ body[data-signed-in="no"] .topbar{display:none}
 .faqhow-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
 .faqhow-icon { font-size: 1.8rem; }
 .faqhow h4 { margin: 0; font-size: 1.1rem; } .faqhow-head p { margin: 2px 0 0; opacity: .75; }
-.faqhow .bk-steplist li { grid-template-columns: 34px 0 1fr; }
+.faqhow .bk-steplist li { grid-template-columns: 24px 1fr; gap: 12px; padding: 10px 14px; }
+.faqhow .bk-steplist li > span:nth-child(2) { display: none; }
+.faqhow .bk-num { width: 22px; height: 22px; font-size: .72rem; background: transparent; color: var(--muted, #6b7280); border: 1.5px solid currentColor; }
 .faqvid { margin-top: 12px; max-width: 560px; }
 .faqvid video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 16 / 9; }
 #sitegate { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; color: var(--text);
