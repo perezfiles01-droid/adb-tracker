@@ -743,19 +743,6 @@
            "Use the Record Management Review view to confirm the retention and sensitivity labels."
           ]
          ]
-        },
-        {
-         "type": "quiz",
-         "items": [
-          [
-           "What determines a record's retention period?",
-           "The library. Each library is mapped to one retention label."
-          ],
-          [
-           "Does an image file require a sensitivity label?",
-           "No. Images, video and email files do not."
-          ]
-         ]
         }
        ]
       },
@@ -784,19 +771,6 @@
            "🧪",
            "ITD",
            "ADB's IT department. Its TCS QA team performs System Integration Testing (SIT) and production sanity testing."
-          ]
-         ]
-        },
-        {
-         "type": "quiz",
-         "items": [
-          [
-           "Who performs UAT?",
-           "RAC."
-          ],
-          [
-           "Who performs SIT?",
-           "ITD's TCS QA team."
           ]
          ]
         }
