@@ -154,15 +154,59 @@
      "steps": [
       [
        "Install the Windows App",
-       "On Windows, download the Windows App from the Microsoft Store."
+       "On Windows, download the Windows App from the Microsoft Store.",
+       [
+        "faq-images/mw1im3y5ason.jpg"
+       ]
       ],
       [
        "Sign in and open Apps",
-       "Sign in with your ADB account, then go to the Apps tab. The virtual machine (VM) is listed there."
+       "Sign in with your ADB account, then go to the Apps tab. The virtual machine (VM) is listed there.",
+       [
+        "faq-images/mw1imj660ofv.jpg"
+       ]
       ],
       [
        "Log in to the VM",
-       "Open the VM and log in with the credential password provided to you."
+       "Open the VM and log in with the credential password provided to you.",
+       [
+        "faq-images/mw1ioox5eici.jpg"
+       ]
+      ],
+      [
+       "Open Visual Studio Code",
+       "On the VM desktop, double click Visual Studio Code. Wait for the extensions to finish loading (the left panel will show “Getting Your Connections...” for a few seconds).",
+       [
+        "faq-images/mw1iwueeed11.jpg"
+       ]
+      ],
+      [
+       "Open the PostgreSQL panel",
+       "Click the PostgreSQL icon (elephant) on the left sidebar. Under Connections > Servers, click the server psql-flex-drm-npr-sea to connect.",
+       [
+        "faq-images/mw1ixtmvhmmh.jpg"
+       ]
+      ],
+      [
+       "Go to the tables",
+       "Expand Databases > drm-npr > Schemas > public > Tables. All EDRMS reporting tables are listed here (for example, TrackingRecords).",
+       [
+        "faq-images/mw1j0zjg9bhh.jpg"
+       ]
+      ],
+      [
+       "Generate the table script",
+       "Right click the table you need, then click Script as > Script as Create. A new query tab opens showing the table’s structure (its columns and data types).",
+       [
+        "faq-images/mw1j22jr1rcr.jpg"
+       ]
+      ],
+      [
+       "Run a query to see the records",
+       "In the script tab, write or paste a SELECT query below the script (for example: SELECT * FROM public.\"TrackingRecords\";). Highlight only the SELECT lines, then press Shift+Enter (or click the green Run button at the top right). The records appear in the PostgreSQL Query Results panel at the bottom.",
+       [
+        "faq-images/mw1j4imlmpua.jpg"
+       ]
       ]
      ]
     }
