@@ -211,6 +211,70 @@
      ]
     }
    ]
+  },
+  {
+   "question": "How to create jira tickets?",
+   "videos": [
+    {
+     "name": "Creating a Jira ticket",
+     "icon": "📄",
+     "desc": "Jira is only reachable through the Singapore VPN, so connect to it first before opening Jira.",
+     "steps": [
+      [
+       "Connect to the Singapore VPN",
+       "Open your VPN app and connect to the Singapore server. Jira will not load without this connection.",
+       [
+        "faq-images/mw1jh8uuofc7.jpg"
+       ]
+      ],
+      [
+       "Open Jira",
+       "Open your browser and go to the ADB Jira site. Sign in with your account if asked.",
+       [
+        "faq-images/mw1jifsnsuqr.jpg"
+       ]
+      ],
+      [
+       "Check the release in Releases",
+       "Go to the project, then click Releases on the left menu. Confirm the release version you need (for example, R2026.4) is listed. If it is missing, ask the PM (Project Manager) to create it first, because you cannot link a ticket to a release that does not exist yet.",
+       [
+        "faq-images/mw1jjkmmly1s.jpg"
+       ]
+      ],
+      [
+       "Click Create",
+       "Click the Create button at the top of the page. The new ticket form opens.",
+       [
+        "faq-images/mw1jk7kazrrb.jpg"
+       ]
+      ],
+      [
+       "Fill in the Summary",
+       "Type a clear title in the Summary field. This is the ticket name everyone sees, so keep it short and specific"
+      ],
+      [
+       "Set the Component",
+       "Choose the matching Component. This tells the team which part of the system the ticket belongs to."
+      ],
+      [
+       "Set Affects Version and Fix Version",
+       "Choose the Affects Version (the release where the issue was found) and the Fix Version (the release where it will be fixed or delivered)."
+      ],
+      [
+       "Add the Acceptance Criteria",
+       "Paste the acceptance criteria into the Acceptance Criteria field. These are the conditions that must be true for the ticket to count as done."
+      ],
+      [
+       "Assign the developer",
+       "In the Assignee field, choose the developer responsible for this work."
+      ],
+      [
+       "Review and click Create",
+       "Check every field once more, then click Create at the bottom of the form. The ticket now appears in the project and under its release."
+      ]
+     ]
+    }
+   ]
   }
  ]
 }
