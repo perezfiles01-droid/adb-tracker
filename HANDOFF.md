@@ -1,6 +1,6 @@
 # Session handoff: Project Knowledge (adb-tracker)
 
-Last updated 4 November 2026. Read this, then `CLAUDE.md`, before changing
+Last updated 4 November 2026 (process section added the same day). Read this, then `CLAUDE.md`, before changing
 anything. It is the state of the site and every decision the owner has made.
 
 ## What this is
@@ -80,7 +80,7 @@ video. Each block animates in.
      centralized (2026.2), email in Outlook (2026.3).
   2. How to access the database? The jump host through the Windows App, then
      VS Code, PostgreSQL, tables, and a query. Screenshots on every step.
-  3. A third question, added by the owner.
+  3. How to create jira tickets? Added by the owner from the site.
 - **View mode:**
   - Questions start closed, each with a ▸ arrow.
   - A 🔍 search filters as you type and opens the matches.
@@ -124,22 +124,103 @@ video. Each block animates in.
   blocked). Verify by running locally under a `/adb-tracker/` path, check the
   Pages run, and say plainly that the live page was not seen.
 
+## How we work: the exact routine, every request
+
+This is how every change has been handled. A new session should behave the
+same way, so the owner never notices that the chat changed.
+
+### 1. Before touching anything
+```bash
+cd /home/user/adb-tracker            # or wherever the clone is
+git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'   # once; the clone lacked it
+git checkout main && git pull        # ALWAYS: the owner publishes FAQ edits from the site
+```
+
+### 2. Decide the lane
+- **Fast lane:** wording, content, `data/tracker.json`, CSS, docs. Push
+  straight to `main`. About 1 to 3 minutes end to end.
+- **Full lane:** anything in `assets/*.js`, or new behaviour. Use a branch, a
+  PR, wait for Checks, merge, then confirm the deploy.
+- **Unsure?** Use the full lane.
+
+### 3. If the owner asked for a mockup, or it is new content
+Write the mockup in the chat first, using a formal tone and the same
+structure the page will have. List what to confirm. Wait for "go" or
+corrections. **Do not ask about merging or deploying**; that is always yes.
+
+### 4. Make the change
+- Edit the files.
+- For `data/tracker.json` content, a small Python script that loads the JSON,
+  changes it and dumps it with `indent=1, ensure_ascii=False` keeps the diff
+  clean.
+- After any change to `assets/`, `index.html` or `data/tracker.json`, run
+  `python3 scripts/build_standalone.py`.
+
+### 5. Verify
+```bash
+export CHROMIUM_PATH=/opt/pw-browsers/chromium
+node checks/check_render.mjs && node checks/check_search.mjs      # fast lane
+ls checks/check_*.mjs | xargs -P4 -I{} sh -c 'node {} >/dev/null 2>&1 || echo "FAIL {}"'   # full lane: prints nothing but FAILs
+OUT=/tmp node scripts/live_check.cjs faq     # or: adb | kt <chapter 0-7> | publish
+```
+- `live_check.cjs` serves the repo under `/adb-tracker/`, the way live behaves,
+  passes the password and opens ADB.
+- **Pass:** `errors []` and `bad []`.
+- **Always look at the screenshot.** Two real bugs were only visible there: a
+  screenshot showing before its click, and buttons stretched full width.
+- `publish` fakes GitHub and prints what would have been committed. It never
+  writes to the real repo. **Never test Publish against the real repo.**
+- **If a check fails, read its output** (rerun it alone). Two failures in this
+  project were the test itself (parallel load) or old data, not the change.
+  Prove which before changing code.
+
+### 6. Ship
+**Fast lane:**
+```bash
+git commit -am "<what changed, plain words>"   # message ends with the attribution lines the session gives
+git push origin main
+sha=$(git rev-parse HEAD)
+until [ "$(gh api "repos/perezfiles01-droid/adb-tracker/actions/runs?head_sha=$sha" --jq '[.workflow_runs[]|select(.name=="Deploy site to GitHub Pages" and .status=="completed")]|length')" -ge 1 ]; do sleep 5; done
+gh api "repos/perezfiles01-droid/adb-tracker/actions/runs?head_sha=$sha" --jq '.workflow_runs[]|select(.name=="Deploy site to GitHub Pages")|.conclusion'   # must print success
+```
+
+**Full lane:**
+1. Make a branch: `git checkout -b claude/<topic>`.
+2. Commit, then `git fetch origin && git merge origin/main`. This brings in the
+   owner's FAQ publishes, so they are never overwritten.
+3. Push.
+4. Open the PR with the GitHub MCP tool `create_pull_request`. The body says
+   what changed, how it was verified, and ends with the PR attribution lines.
+5. Wait for **Checks** on the PR head SHA, using the same `until` loop with
+   `.name=="Checks"`. It must be `success`.
+6. Merge with `merge_pull_request`, method `merge`, `expectedHeadSha` set to
+   the head SHA.
+7. Wait for the Pages run on the **merge SHA**. It must be `success`.
+8. `git checkout main && git pull`.
+
+### 7. Report to the owner
+Short and plain, in this shape:
+1. **One line:** it's live, with the link
+   https://perezfiles01-droid.github.io/adb-tracker/ and "press **Ctrl+Shift+R**".
+2. **What to click** to see it: **ADB** → the card → …
+3. **What changed**, as a few bullets in their words.
+4. **What was checked**, then: "I can't open github.io from here, so I haven't
+   seen the live page itself."
+5. **Anything open or worth confirming** (only if real), with a suggested next
+   step.
+
+No apologies, no asking permission to merge or deploy, and no technical
+detail they did not ask for.
+
+### 8. When the owner publishes from the site
+Their edits arrive on `main` as commits named "Update the FAQ from the site"
+or "FAQ screenshot …". That is normal. Pull before editing `data/faq.json`.
+**Never overwrite it with an older copy.**
+
 ## How to test locally like the live site
 
-```bash
-mkdir -p /tmp/srv && ln -sfn "$PWD" /tmp/srv/adb-tracker
-(cd /tmp/srv && python3 -m http.server 8765 &)
-# open http://localhost:8765/adb-tracker/ with Playwright, password adb,
-# then "Use this computer only"
-```
-
-```bash
-python3 scripts/build_standalone.py
-CHROMIUM_PATH=/opt/pw-browsers/chromium node checks/check_render.mjs
-```
-
-The full suite is every file in `checks/`. Run them four in parallel at most:
-eight in parallel caused one flaky failure.
+Use `node scripts/live_check.cjs <mode>` (step 5 above). It replaces the
+hand-rolled server and Playwright scripts used in the first session.
 
 ## Known gotchas
 

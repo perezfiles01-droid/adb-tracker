@@ -95,7 +95,7 @@ deploy succeeded" up to "I watched it work".
 
 ```bash
 python3 scripts/build_standalone.py     # REQUIRED: every check runs against this file
-CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome \
+CHROMIUM_PATH=/opt/pw-browsers/chromium \
   node checks/check_<name>.mjs          # the guard for whatever changed
 ```
 
@@ -104,9 +104,10 @@ loads *it*, not `index.html`, so a stale one means the whole suite tests the
 old app and passes. Rebuild before running anything and before every commit.
 
 Playwright's npm package is newer than the pre-installed browser, so
-`CHROMIUM_PATH` must point at
-`/opt/pw-browsers/chromium-1194/chrome-linux/chrome` or every browser check
-dies with "Executable doesn't exist". Do not run `playwright install` — the
+`CHROMIUM_PATH` must point at the pre-installed Chromium or every browser
+check dies with "Executable doesn't exist". In these sessions that is
+`/opt/pw-browsers/chromium` (measured 4 Nov 2026; the older
+`chromium-1194/...` path no longer exists). If it moves, `ls /opt/pw-browsers/`. Do not run `playwright install` — the
 download host is blocked.
 
 ## Adding an asset file
