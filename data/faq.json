@@ -1,0 +1,140 @@
+{
+ "items": [
+  {
+   "question": "How to declare a record?",
+   "videos": [
+    {
+     "name": "Declaring a single record",
+     "icon": "📄",
+     "desc": "Turn one document into an official record.",
+     "steps": [
+      [
+       "Open the site",
+       "Go to an EDRMS compliant SharePoint site. The EDRMS logo shows at the top."
+      ],
+      [
+       "Select the library",
+       "Choose the library, and a folder if needed."
+      ],
+      [
+       "Add the document",
+       "Click Create or upload and choose the file."
+      ],
+      [
+       "Apply a sensitivity label",
+       "Required for Word, Excel and other Office files. Not required for images, video or email files."
+      ],
+      [
+       "Declare",
+       "Click ⋯ next to the file and select Declare as record."
+      ],
+      [
+       "Physical counterpart",
+       "Choose Yes if a paper copy exists, otherwise No."
+      ],
+      [
+       "Submit",
+       "Wait for the confirmation message. A lock icon appears on the file."
+      ],
+      [
+       "Verify",
+       "Switch to the Record Management Review view and check the retention and sensitivity labels."
+      ]
+     ]
+    },
+    {
+     "name": "Declaring multiple records",
+     "icon": "📚",
+     "release": "Release 2026.1",
+     "desc": "Declare several documents in one action.",
+     "steps": [
+      [
+       "Open the site",
+       "Open the EDRMS site and select the library."
+      ],
+      [
+       "Select the documents",
+       "Tick the checkbox beside each file."
+      ],
+      [
+       "Check sensitivity labels",
+       "Each Office file needs a sensitivity label."
+      ],
+      [
+       "Declare",
+       "Click Declare as record from the toolbar."
+      ],
+      [
+       "Submit",
+       "Every selected file shows a lock icon."
+      ],
+      [
+       "Verify",
+       "Check the files in the Record Management Review view."
+      ]
+     ]
+    },
+    {
+     "name": "Declaring a centralized email",
+     "icon": "🏛️",
+     "release": "Release 2026.2",
+     "desc": "Declare a record into the central records location rather than the site where it was created.",
+     "steps": [
+      [
+       "Select the item",
+       "Select the email or document to declare."
+      ],
+      [
+       "Declare",
+       "Choose Declare as record, then select the central records location as the destination."
+      ],
+      [
+       "Physical counterpart",
+       "Choose Yes if a paper copy exists, otherwise No."
+      ],
+      [
+       "Submit",
+       "The record is stored centrally and locked."
+      ],
+      [
+       "Verify",
+       "Check it in the central location's Record Management Review view."
+      ]
+     ]
+    },
+    {
+     "name": "Declaring an email in Outlook",
+     "icon": "📧",
+     "release": "Release 2026.3",
+     "desc": "Declare an email as a record without leaving Outlook.",
+     "steps": [
+      [
+       "Open Outlook",
+       "Select the email to declare."
+      ],
+      [
+       "Open the add-in",
+       "Click the EDRMS add-in button in the ribbon."
+      ],
+      [
+       "Choose the destination",
+       "Select the EDRMS site and library where the email will be stored."
+      ],
+      [
+       "Physical counterpart",
+       "Choose Yes if a paper copy exists, otherwise No."
+      ],
+      [
+       "Submit",
+       "A confirmation shows the email has been declared."
+      ],
+      [
+       "Verify",
+       "Find the email in the selected library in SharePoint."
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}
