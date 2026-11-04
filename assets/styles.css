@@ -877,3 +877,10 @@ p.faqed { display: block; margin: 4px 0 0; }
    outranked .faqshots{display:none} and showed screenshots unclicked. */
 .faqstep .faqshots { display: none; }
 .faqstep.showimg .faqshots { display: flex; }
+/* An arrow on each question so it reads as something to open. */
+.faqq summary { list-style: none; }
+.faqq summary::-webkit-details-marker { display: none; }
+.faqq summary::after { content: "▸"; margin-left: auto; opacity: .5; transition: transform .2s; flex: none; }
+.faqq[open] summary::after { transform: rotate(90deg); }
+.faqq summary .faqbtn + * { margin-left: 0; }
+.faqq summary:has(.faqbtn)::after { margin-left: 8px; }
