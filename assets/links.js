@@ -349,7 +349,8 @@
     return `<div class="ptiles">${tiles ||
         `<div class="empty">No project matches that search.</div>`}</div>
       ${listFoot(window.TrackerUI.pager("projects", list.length, PROJ_PER_PAGE),
-                 `<button class="btn primary" data-newproject="1">Create Project</button>`)}`;
+                 // The live ADB site is a fixed knowledge base: no project editing.
+                 window.TRACKER_CLEAN ? "" : `<button class="btn primary" data-newproject="1">Create Project</button>`)}`;
   }
 
   /**
@@ -553,29 +554,207 @@
         ${!open ? "" : open.type === "book" ? bookView(name, open) : faqView(open)}
       </div>`;
   }
-  /* FAQ: a list of questions. Each opens to its videos; a video with no
-     src yet shows as a "Coming soon" slot so the structure is visible now. */
+  /* ---------- FAQ, editable and published to everyone ----------
+     The FAQ lives in data/faq.json in the repo. Everyone reads that file
+     (never cached, so a publish shows within about a minute). The owner
+     edits a draft in memory, then Publish writes faq.json and any new
+     screenshots to the repo through the GitHub API, using an access key
+     kept in Settings on the owner's computer only. Pages redeploys on that
+     commit, and every visitor gets the change.
+
+     Screenshots are never put in localStorage: a pending one is held in
+     memory until Publish, then it is a file in faq-images/. */
+  const FAQ_REPO = "perezfiles01-droid/adb-tracker", FAQ_FILE = "data/faq.json";
+  const TOKEN_KEY = "tracker.githubToken";
+  let faqLive = null, faqDraft = null, faqEditing = false, faqDirty = false, faqStatus = "";
+  const faqPending = new Map();
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const rerender = () => { if (window.TrackerRender) window.TrackerRender(); };
+
+  (function faqLoad() {
+    if (!window.TRACKER_CLEAN || typeof fetch !== "function") return;
+    fetch(`${FAQ_FILE}?t=${Date.now()}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (j && Array.isArray(j.items)) { faqLive = j.items; if (!faqEditing) rerender(); } })
+      .catch(() => { /* keep the copy in tracker.json */ });
+  })();
+
+  const imgSrc = (path) => (faqPending.has(path) ? faqPending.get(path) : path);
+
   function faqView(sec) {
-    const qs = sec.items || [];
+    const qs = faqEditing ? faqDraft : (faqLive || sec.items || []);
+    const E = faqEditing;
+    const ed = (path, val, tag = "span", cls = "") =>
+      E ? `<${tag} class="faqed ${cls}" contenteditable="plaintext-only" data-faqf="${path}">${esc(val || "")}</${tag}>`
+        : `<${tag}${cls ? ` class="${cls}"` : ""}>${esc(val || "")}</${tag}>`;
+    const act = (a, label, cls = "") => `<button class="btn faqbtn ${cls}" data-faqact="${a}">${label}</button>`;
     return `
       <div class="opened">
-        <div class="sectionhead"><h2 class="page sub">${esc(sec.title)}</h2></div>
-        ${qs.length ? `<div class="faqlist">${qs.map((q, i) => `
-          <details class="faqq"${i === 0 ? " open" : ""}>
-            <summary><span class="faqnum">${i + 1}</span>${esc(q.question)}</summary>
-            <div class="faqhowlist">${(q.videos || []).map((v) => `
+        <div class="sectionhead">
+          <h2 class="page sub">${esc(sec.title)}</h2>
+          <div class="sectiontools">${E
+            ? `${act("cancel", "Cancel")}${act("publish", "⬆ Publish to everyone", "primary")}`
+            : `<button class="btn" data-faqact="edit">✎ Edit</button>`}</div>
+        </div>
+        ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
+        ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
+        ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
+          <details class="faqq"${qi === 0 || E ? " open" : ""}>
+            <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
+              ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
+            <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
               <section class="faqhow">
-                <div class="faqhow-head"><span class="faqhow-icon">${esc(v.icon || "🎬")}</span>
-                  <div><h4>${esc(v.name)}${v.release ? ` <span class="tag">${esc(v.release)}</span>` : ""}</h4>
-                  ${v.desc ? `<p>${esc(v.desc)}</p>` : ""}</div></div>
-                ${v.steps ? `<ol class="bk-steplist">${v.steps.map(([t, x], j) =>
-                  `<li><span class="bk-num">${j + 1}</span><span></span><div><b>${esc(t)}</b><span>${esc(x)}</span></div></li>`).join("")}</ol>` : ""}
+                <div class="faqhow-head"><span class="faqhow-icon">${esc(v.icon || "📄")}</span>
+                  <div style="flex:1"><h4>${ed(`${qi}|${vi}|name`, v.name)}
+                    ${E ? ed(`${qi}|${vi}|release`, v.release, "span", "tag") : v.release ? ` <span class="tag">${esc(v.release)}</span>` : ""}</h4>
+                  ${E || v.desc ? ed(`${qi}|${vi}|desc`, v.desc, "p") : ""}</div>
+                  ${E ? act(`delg:${qi}.${vi}`, "🗑 Delete guide", "danger") : ""}</div>
+                <ol class="bk-steplist">${(v.steps || []).map((st, si) => {
+                  const [t, x, img] = st;
+                  return `<li class="faqstep${img ? " hasimg" : ""}" data-faqstep>
+                    <span class="bk-num">${si + 1}</span>
+                    <div class="faqstep-body"><b>${ed(`${qi}|${vi}|${si}|0`, t)}</b>${ed(`${qi}|${vi}|${si}|1`, x)}
+                      ${img && !E ? `<span class="faqhint">🖼 Click to see the screenshot</span>` : ""}
+                      ${img ? `<img class="faqshot" src="${esc(imgSrc(img))}" alt="Screenshot for step ${si + 1}" loading="lazy">` : ""}
+                      ${E ? `<div class="faqstep-tools">
+                        <label class="btn faqbtn">🖼 ${img ? "Replace" : "Add"} screenshot
+                          <input type="file" accept="image/*" hidden data-faqimg="${qi}.${vi}.${si}"></label>
+                        ${img ? act(`rmimg:${qi}.${vi}.${si}`, "Remove screenshot") : ""}
+                        ${act(`dels:${qi}.${vi}.${si}`, "🗑 Delete step", "danger")}</div>` : ""}
+                    </div></li>`;
+                }).join("")}</ol>
+                ${E ? act(`adds:${qi}.${vi}`, "＋ Add step") : ""}
                 ${v.src ? `<div class="faqvid"><video controls playsinline preload="metadata" src="${esc(v.src)}"></video></div>` : ""}
               </section>`).join("")}</div>
+            ${E ? act(`addg:${qi}`, "＋ Add guide") : ""}
           </details>`).join("")}</div>`
           : `<div class="empty">No questions added yet.</div>`}
+        ${E ? `<div style="margin-top:12px">${act("addq", "＋ Add question")}</div>` : ""}
       </div>`;
   }
+
+  function faqSet(path, val) {
+    const p = path.split("|"), q = faqDraft[+p[0]];
+    if (p.length === 2) { q[p[1]] = val; return; }
+    const v = q.videos[+p[1]];
+    if (p.length === 3) { v[p[2]] = val; return; }
+    v.steps[+p[2]][+p[3]] = val;
+  }
+
+  function faqShrink(file) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 1600 / img.width), c = document.createElement("canvas");
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(img.src);
+        res(c.toDataURL("image/jpeg", 0.85));
+      };
+      img.onerror = () => rej(new Error("That file could not be read as an image."));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  const b64utf8 = (str) => btoa(unescape(encodeURIComponent(str)));
+
+  async function faqPublish() {
+    let tok = window.TrackerStore.getText(TOKEN_KEY);
+    if (!tok) {
+      tok = (prompt("Paste your GitHub access key to publish.\n\nIt is saved on this computer only, so you are asked once.") || "").trim();
+      if (!tok) return;
+      window.TrackerStore.setText(TOKEN_KEY, tok);
+    }
+    const api = (path, opt = {}) => fetch(`https://api.github.com/repos/${FAQ_REPO}/contents/${path}`, {
+      ...opt, headers: { Authorization: `Bearer ${tok}`, Accept: "application/vnd.github+json" } });
+    const fail = async (r) => {
+      let msg = ""; try { msg = (await r.json()).message || ""; } catch { /* no body */ }
+      if (r.status === 401 || r.status === 403) window.TrackerStore.remove(TOKEN_KEY);
+      throw new Error(`GitHub refused (${r.status}${msg ? `: ${msg}` : ""}).` +
+        (r.status === 401 || r.status === 403 ? " The access key was cleared; publish again to enter a new one." : ""));
+    };
+    faqStatus = "Publishing…"; rerender();
+    try {
+      const used = JSON.stringify(faqDraft);
+      for (const [path, data] of faqPending) {
+        if (!used.includes(`"${path}"`)) continue;
+        const r = await api(path, { method: "PUT", body: JSON.stringify({ message: `FAQ screenshot ${path}`, content: data.split(",")[1] }) });
+        if (!r.ok) await fail(r);
+      }
+      const cur = await api(FAQ_FILE);
+      if (!cur.ok && cur.status !== 404) await fail(cur);
+      const sha = cur.ok ? (await cur.json()).sha : undefined;
+      const r = await api(FAQ_FILE, { method: "PUT", body: JSON.stringify({
+        message: "Update the FAQ from the site", content: b64utf8(JSON.stringify({ items: faqDraft }, null, 1) + "\n"), sha }) });
+      if (!r.ok) await fail(r);
+      faqLive = clone(faqDraft); faqEditing = false; faqDirty = false;
+      faqStatus = "✓ Published. Everyone will see it in about a minute (a hard refresh may be needed).";
+    } catch (err) {
+      faqStatus = `Not published. ${err.message}`;
+    }
+    rerender();
+  }
+
+  document.addEventListener("click", (e) => {
+    const st = e.target.closest && e.target.closest("[data-faqstep]");
+    if (st && !faqEditing && st.classList.contains("hasimg")) { st.classList.toggle("showimg"); return; }
+    const b = e.target.closest && e.target.closest("[data-faqact]");
+    if (!b) return;
+    e.preventDefault();
+    const [a, arg] = b.dataset.faqact.split(":");
+    const ix = (arg || "").split(".").map(Number);
+    const sec = hubSections(groups().find((g) => slug(g.name) === selected)?.name || "").find((s) => s.type === "videos");
+    if (a === "edit") { faqDraft = clone(faqLive || (sec && sec.items) || []); faqEditing = true; faqDirty = false; faqStatus = ""; }
+    else if (a === "cancel") {
+      if (faqDirty && !confirm("Discard your unpublished changes?")) return;
+      faqEditing = false; faqPending.clear(); faqStatus = "";
+    }
+    else if (a === "publish") { faqPublish(); return; }
+    else {
+      const q = faqDraft[ix[0]], v = q && q.videos && q.videos[ix[1]];
+      const sure = (what) => confirm(`Delete this ${what}? It is removed for everyone when you publish.`);
+      if (a === "addq") faqDraft.push({ question: "New question", videos: [{ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] }] });
+      else if (a === "delq") { if (!sure("question")) return; faqDraft.splice(ix[0], 1); }
+      else if (a === "addg") (q.videos = q.videos || []).push({ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] });
+      else if (a === "delg") { if (!sure("guide")) return; q.videos.splice(ix[1], 1); }
+      else if (a === "adds") (v.steps = v.steps || []).push(["Step title", "What to do."]);
+      else if (a === "dels") { if (!sure("step")) return; v.steps.splice(ix[2], 1); }
+      else if (a === "rmimg") v.steps[ix[2]].length = 2;
+      faqDirty = true;
+    }
+    rerender();
+  });
+  document.addEventListener("input", (e) => {
+    const el = e.target.closest && e.target.closest("[data-faqf]");
+    if (!el || !faqEditing) return;
+    faqSet(el.dataset.faqf, el.textContent.replace(/\s+/g, " ").trim());
+    faqDirty = true;
+  });
+  document.addEventListener("keydown", (e) => {
+    const el = e.target.closest && e.target.closest("[data-faqf]");
+    if (!el) return;
+    if (e.key === "Enter") { e.preventDefault(); el.blur(); }
+    if (e.key === " " && el.closest("summary")) e.stopPropagation();
+  }, true);
+  // Typing in the question must not open and close it.
+  document.addEventListener("click", (e) => {
+    if (faqEditing && e.target.closest && e.target.closest("summary") && !e.target.closest("[data-faqact]")) e.preventDefault();
+  }, true);
+  document.addEventListener("change", async (e) => {
+    const inp = e.target.closest && e.target.closest("[data-faqimg]");
+    if (!inp || !inp.files || !inp.files[0]) return;
+    const [qi, vi, si] = inp.dataset.faqimg.split(".").map(Number);
+    try {
+      const data = await faqShrink(inp.files[0]);
+      const path = `faq-images/${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.jpg`;
+      faqPending.set(path, data);
+      faqDraft[qi].videos[vi].steps[si][2] = path;
+      faqDirty = true;
+    } catch (err) { alert(err.message); }
+    rerender();
+  });
+  window.addEventListener("beforeunload", (e) => { if (faqEditing && faqDirty) { e.preventDefault(); e.returnValue = ""; } });
+
   document.addEventListener("click", (e) => {
     const h = e.target.closest && e.target.closest("[data-hub]");
     if (!h) return;
@@ -674,10 +853,10 @@
       <h2 class="page">${window.TRACKER_CLEAN ? "Project Knowledge" : "Projects"}</h2>
       <div class="sectionhead">
         <div class="sectionleft">${searchBox("projects", "Search projects…")}</div>
-        <div class="sectiontools">
+        ${window.TRACKER_CLEAN ? "" : `<div class="sectiontools">
           <button class="btn" data-projectaction="rename">Rename project</button>
           <button class="btn" data-projectaction="delete">Delete project</button>
-        </div>
+        </div>`}
       </div>
       ${projectsTable()}
       ${g && bookSection(g.name) ? hubView(g.name) : g ? `

@@ -114,6 +114,10 @@
       "tracker.theme",
       "tracker.clientId",
       "tracker.apiKey",
+      // The owner's GitHub access key for publishing the FAQ. A credential:
+      // a setting, so it never enters the backup file, and it stays on the
+      // owner's computer only.
+      "tracker.githubToken",
       // The Anthropic key for the Standardize button. A setting, not data,
       // so it stays out of the backup file exactly like the two above.
       // The Standardize engine: a key and a model, kept per engine so putting
