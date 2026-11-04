@@ -884,3 +884,8 @@ p.faqed { display: block; margin: 4px 0 0; }
 .faqq[open] summary::after { transform: rotate(90deg); }
 .faqq summary .faqbtn + * { margin-left: 0; }
 .faqq summary:has(.faqbtn)::after { margin-left: 8px; }
+.faqsearch { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 0 14px; max-width: 560px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.faqsearch input { flex: 1; border: 0; background: transparent; padding: 11px 0; font: inherit; color: inherit; outline: none; }
+.faqsearch:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.faqsearch-n { font-size: .8rem; opacity: .6; white-space: nowrap; }

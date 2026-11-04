@@ -582,13 +582,57 @@
   // A step's screenshots: a list now. Older data held one path as a string.
   const shotsOf = (st) => (Array.isArray(st[2]) ? st[2] : st[2] ? [st[2]] : []);
   let faqActive = "";
+  /* ---------- FAQ search ----------
+     Filters in place, without re-rendering, so the box keeps focus while
+     typing. Matches the question, guide names, descriptions and step text.
+     A matching question opens; inside it, guides with no match are hidden.
+     Clearing the box puts every question back as it was. */
+  let faqQuery = "";
+  const faqText = (q) => [q.question || "", ...(q.videos || []).flatMap((v) =>
+    [v.name, v.desc, v.release, ...(v.steps || []).flatMap((st) => [st[0], st[1]])])].join(" ").toLowerCase();
+  function faqFilter() {
+    const box = document.querySelector("[data-faqsearch]");
+    if (!box) return;
+    const words = faqQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    const hit = (el) => words.every((w) => (el.dataset.find || "").includes(w));
+    let n = 0;
+    document.querySelectorAll("details.faqq").forEach((d) => {
+      if (!words.length) {
+        if (d.hidden) d.hidden = false;
+        if (d.open !== faqOpen.has(+d.dataset.qi)) d.open = faqOpen.has(+d.dataset.qi);
+        d.querySelectorAll(".faqhow").forEach((g) => { g.hidden = false; });
+        return;
+      }
+      const ok = hit(d);
+      d.hidden = !ok;
+      if (!ok) return;
+      n++;
+      d.open = true;
+      const guides = [...d.querySelectorAll(".faqhow")];
+      const any = guides.some(hit);
+      guides.forEach((g) => { g.hidden = any && !hit(g); });
+    });
+    const out = document.querySelector("[data-faqsearch-n]");
+    // Written only when it changes: the observer below watches the page,
+    // and rewriting the same text is a mutation that would call this again.
+    const label = words.length ? (n ? `${n} ${n === 1 ? "question" : "questions"}` : "No matches") : "";
+    if (out && out.textContent !== label) out.textContent = label;
+  }
+  document.addEventListener("input", (e) => {
+    if (!e.target.matches || !e.target.matches("[data-faqsearch]")) return;
+    faqQuery = e.target.value;
+    faqFilter();
+  });
+  // Re-apply after any re-render, so a running search survives it.
+  new MutationObserver(() => { if (faqQuery && document.querySelector("[data-faqsearch]")) faqFilter(); })
+    .observe(document.documentElement, { childList: true, subtree: true });
   // Which questions are open. Kept across re-renders, so adding a step or a
   // screenshot does not fold the question you are working in; everything
   // starts closed, in view and in edit mode alike.
   const faqOpen = new Set();
   document.addEventListener("toggle", (e) => {
     const d = e.target;
-    if (!d.classList || !d.classList.contains("faqq")) return;
+    if (!d.classList || !d.classList.contains("faqq") || faqQuery.trim()) return;
     if (d.open) faqOpen.add(+d.dataset.qi); else faqOpen.delete(+d.dataset.qi);
   }, true);
   const imgSrc = (path) => (faqPending.has(path) ? faqPending.get(path) : path);
@@ -609,13 +653,16 @@
             : `<button class="btn" data-faqact="edit">✎ Edit</button>`}</div>
         </div>
         ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
+        ${!E && qs.length ? `<div class="faqsearch"><span aria-hidden="true">🔍</span>
+          <input type="search" data-faqsearch placeholder="Search questions and steps…" aria-label="Search the FAQ" value="${esc(faqQuery)}">
+          <span class="faqsearch-n" data-faqsearch-n></span></div>` : ""}
         ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
         ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
-          <details class="faqq" data-qi="${qi}"${faqOpen.has(qi) ? " open" : ""}>
+          <details class="faqq" data-qi="${qi}" data-find="${esc(faqText(q))}"${faqOpen.has(qi) ? " open" : ""}>
             <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
               ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
             <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
-              <section class="faqhow">
+              <section class="faqhow" data-find="${esc(faqText({ videos: [v] }))}">
                 <div class="faqhow-head"><span class="faqhow-icon">${esc(v.icon || "📄")}</span>
                   <div style="flex:1"><h4>${ed(`${qi}|${vi}|name`, v.name)}
                     ${E ? ed(`${qi}|${vi}|release`, v.release, "span", "tag") : v.release ? ` <span class="tag">${esc(v.release)}</span>` : ""}</h4>
