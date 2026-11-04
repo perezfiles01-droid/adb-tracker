@@ -860,3 +860,20 @@ p.faqed { display: block; margin: 4px 0 0; }
 .faqhow .bk-steplist li { grid-template-columns: 24px 1fr; }
 .faqstep-tools { flex-direction: row !important; align-items: center; }
 .faqstep-tools .btn { width: auto; flex: none; }
+.faqshots { display: none; flex-direction: column; gap: 10px; margin-top: 10px; }
+.faqstep.showimg .faqshots, .bk-steplist li .faqstep-body .faqed ~ .faqshots { display: flex !important; }
+.faqshotwrap { position: relative; margin: 0; }
+.faqshotwrap .faqshot { display: block !important; margin: 0; }
+.faqx { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(0,0,0,.65); color: #fff; font-size: .85rem; }
+.faqpaste { margin-top: 8px; padding: 10px 12px; border: 2px dashed var(--line); border-radius: 10px; font-size: .85rem;
+  opacity: .8; cursor: pointer; text-align: center; }
+.faqstep.active .faqpaste { border-color: #3b82f6; background: rgba(59,130,246,.08); opacity: 1; }
+.faqstep.active { box-shadow: inset 0 0 0 2px rgba(59,130,246,.5); }
+/* The screenshot hint stays quiet: the steps are the point. */
+.faqhint { font-size: .7rem !important; opacity: .4 !important; letter-spacing: .02em; margin-top: 2px; }
+.faqstep.hasimg:hover .faqhint { opacity: .7 !important; }
+/* .bk-steplist li div sets display:flex on every div in a step, which
+   outranked .faqshots{display:none} and showed screenshots unclicked. */
+.faqstep .faqshots { display: none; }
+.faqstep.showimg .faqshots { display: flex; }
