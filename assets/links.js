@@ -579,6 +579,9 @@
       .catch(() => { /* keep the copy in tracker.json */ });
   })();
 
+  // A step's screenshots: a list now. Older data held one path as a string.
+  const shotsOf = (st) => (Array.isArray(st[2]) ? st[2] : st[2] ? [st[2]] : []);
+  let faqActive = "";
   const imgSrc = (path) => (faqPending.has(path) ? faqPending.get(path) : path);
 
   function faqView(sec) {
@@ -599,7 +602,7 @@
         ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
         ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
         ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
-          <details class="faqq"${qi === 0 || E ? " open" : ""}>
+          <details class="faqq"${E ? " open" : ""}>
             <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
               ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
             <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
@@ -610,17 +613,21 @@
                   ${E || v.desc ? ed(`${qi}|${vi}|desc`, v.desc, "p") : ""}</div>
                   ${E ? act(`delg:${qi}.${vi}`, "🗑 Delete guide", "danger") : ""}</div>
                 <ol class="bk-steplist">${(v.steps || []).map((st, si) => {
-                  const [t, x, img] = st;
-                  return `<li class="faqstep${img ? " hasimg" : ""}" data-faqstep>
+                  const [t, x] = st, imgs = shotsOf(st), key = `${qi}.${vi}.${si}`;
+                  return `<li class="faqstep${imgs.length ? " hasimg" : ""}${E && faqActive === key ? " active" : ""}" data-faqstep="${key}">
                     <span class="bk-num">${si + 1}</span>
                     <div class="faqstep-body"><b>${ed(`${qi}|${vi}|${si}|0`, t)}</b>${ed(`${qi}|${vi}|${si}|1`, x)}
-                      ${img && !E ? `<span class="faqhint">🖼 Click to see the screenshot</span>` : ""}
-                      ${img ? `<img class="faqshot" src="${esc(imgSrc(img))}" alt="Screenshot for step ${si + 1}" loading="lazy">` : ""}
-                      ${E ? `<div class="faqstep-tools">
-                        <label class="btn faqbtn">🖼 ${img ? "Replace" : "Add"} screenshot
-                          <input type="file" accept="image/*" hidden data-faqimg="${qi}.${vi}.${si}"></label>
-                        ${img ? act(`rmimg:${qi}.${vi}.${si}`, "Remove screenshot") : ""}
-                        ${act(`dels:${qi}.${vi}.${si}`, "🗑 Delete step", "danger")}</div>` : ""}
+                      ${imgs.length && !E ? `<span class="faqhint" title="Click the step to see ${imgs.length === 1 ? "the screenshot" : `${imgs.length} screenshots`}">${imgs.length === 1 ? "screenshot" : `${imgs.length} screenshots`}</span>` : ""}
+                      ${imgs.length ? `<div class="faqshots">${imgs.map((im, k) => `<figure class="faqshotwrap">
+                          <img class="faqshot" src="${esc(imgSrc(im))}" alt="Screenshot ${k + 1} for step ${si + 1}" loading="lazy">
+                          ${E ? `<button class="faqx" data-faqact="rmimg:${key}.${k}" title="Remove this screenshot">✕</button>` : ""}</figure>`).join("")}</div>` : ""}
+                      ${E ? `<div class="faqpaste" tabindex="0" data-faqpaste="${key}">📋 ${faqActive === key
+                          ? "Ready: press Ctrl+V (⌘V on Mac) to paste a screenshot here"
+                          : "Click here, then press Ctrl+V to paste a screenshot"}</div>
+                        <div class="faqstep-tools">
+                        <label class="btn faqbtn">🖼 ${imgs.length ? "Add more" : "Add"} from file
+                          <input type="file" accept="image/*" multiple hidden data-faqimg="${key}"></label>
+                        ${act(`dels:${key}`, "🗑 Delete step", "danger")}</div>` : ""}
                     </div></li>`;
                 }).join("")}</ol>
                 ${E ? act(`adds:${qi}.${vi}`, "＋ Add step") : ""}
@@ -706,6 +713,7 @@
     const sec = hubSections(groups().find((g) => slug(g.name) === selected)?.name || "").find((s) => s.type === "videos");
     if (a === "edit") { faqDraft = clone(faqLive || (sec && sec.items) || []); faqEditing = true; faqDirty = false; faqStatus = ""; }
     else if (a === "cancel") {
+      faqActive = "";
       if (faqDirty && !confirm("Discard your unpublished changes?")) return;
       faqEditing = false; faqPending.clear(); faqStatus = "";
     }
@@ -719,7 +727,11 @@
       else if (a === "delg") { if (!sure("guide")) return; q.videos.splice(ix[1], 1); }
       else if (a === "adds") (v.steps = v.steps || []).push(["Step title", "What to do."]);
       else if (a === "dels") { if (!sure("step")) return; v.steps.splice(ix[2], 1); }
-      else if (a === "rmimg") v.steps[ix[2]].length = 2;
+      else if (a === "rmimg") {
+        const st = v.steps[ix[2]], list = shotsOf(st).slice();
+        list.splice(ix[3], 1);
+        if (list.length) st[2] = list; else st.length = 2;
+      }
       faqDirty = true;
     }
     rerender();
@@ -740,18 +752,55 @@
   document.addEventListener("click", (e) => {
     if (faqEditing && e.target.closest && e.target.closest("summary") && !e.target.closest("[data-faqact]")) e.preventDefault();
   }, true);
-  document.addEventListener("change", async (e) => {
-    const inp = e.target.closest && e.target.closest("[data-faqimg]");
-    if (!inp || !inp.files || !inp.files[0]) return;
-    const [qi, vi, si] = inp.dataset.faqimg.split(".").map(Number);
-    try {
-      const data = await faqShrink(inp.files[0]);
-      const path = `faq-images/${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.jpg`;
-      faqPending.set(path, data);
-      faqDraft[qi].videos[vi].steps[si][2] = path;
-      faqDirty = true;
-    } catch (err) { alert(err.message); }
+  // Add images (from a file picker, a paste or a drop) to one step.
+  async function faqAddShots(key, files) {
+    const [qi, vi, si] = key.split(".").map(Number);
+    const st = faqDraft[qi].videos[vi].steps[si];
+    const list = shotsOf(st).slice();
+    for (const f of files) {
+      if (!f || !/^image\//.test(f.type)) continue;
+      try {
+        const data = await faqShrink(f);
+        const path = `faq-images/${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.jpg`;
+        faqPending.set(path, data);
+        list.push(path);
+      } catch (err) { alert(err.message); }
+    }
+    if (list.length) { st[2] = list; faqDirty = true; }
+    faqActive = key;
     rerender();
+  }
+  document.addEventListener("change", (e) => {
+    const inp = e.target.closest && e.target.closest("[data-faqimg]");
+    if (inp && inp.files && inp.files.length) faqAddShots(inp.dataset.faqimg, [...inp.files]);
+  });
+  // The step you last clicked is where a paste lands.
+  document.addEventListener("click", (e) => {
+    if (!faqEditing) return;
+    const li = e.target.closest && e.target.closest("[data-faqstep]");
+    if (!li || e.target.closest("[data-faqact]") || e.target.closest("label")) return;
+    if (faqActive !== li.dataset.faqstep) {
+      faqActive = li.dataset.faqstep;
+      document.querySelectorAll("[data-faqstep].active").forEach((x) => x.classList.remove("active"));
+      li.classList.add("active");
+      const z = li.querySelector(".faqpaste");
+      if (z) z.textContent = "📋 Ready: press Ctrl+V (⌘V on Mac) to paste a screenshot here";
+    }
+  });
+  document.addEventListener("paste", (e) => {
+    if (!faqEditing || !faqActive) return;
+    const files = [...((e.clipboardData && e.clipboardData.items) || [])]
+      .filter((it) => it.kind === "file" && /^image\//.test(it.type)).map((it) => it.getAsFile());
+    if (!files.length) return;          // plain text pastes into the text as usual
+    e.preventDefault();
+    faqAddShots(faqActive, files);
+  });
+  document.addEventListener("dragover", (e) => { if (faqEditing && e.target.closest && e.target.closest("[data-faqstep]")) e.preventDefault(); });
+  document.addEventListener("drop", (e) => {
+    const li = faqEditing && e.target.closest && e.target.closest("[data-faqstep]");
+    if (!li || !e.dataTransfer || !e.dataTransfer.files.length) return;
+    e.preventDefault();
+    faqAddShots(li.dataset.faqstep, [...e.dataTransfer.files]);
   });
   window.addEventListener("beforeunload", (e) => { if (faqEditing && faqDirty) { e.preventDefault(); e.returnValue = ""; } });
 
