@@ -547,7 +547,7 @@
       <div class="opened">
         <div class="ptiles hubtiles">${secs.map((s) => `
           <button class="ptile${open === s ? " picked" : ""}" data-hub="${esc(slug(s.title))}" aria-expanded="${open === s}">
-            <span class="t">${s.type === "book" ? "📘" : "🎬"} ${esc(s.title)}</span>
+            <span class="t">${s.type === "book" ? "📘" : "❓"} ${esc(s.title)}</span>
             ${s.blurb ? `<span class="psub">${esc(s.blurb)}</span>` : ""}
           </button>`).join("")}</div>
         ${!open ? "" : open.type === "book" ? bookView(name, open) : faqView(open)}
@@ -570,12 +570,10 @@
                   ${v.desc ? `<p>${esc(v.desc)}</p>` : ""}</div></div>
                 ${v.steps ? `<ol class="bk-steplist">${v.steps.map(([t, x], j) =>
                   `<li><span class="bk-num">${j + 1}</span><span></span><div><b>${esc(t)}</b><span>${esc(x)}</span></div></li>`).join("")}</ol>` : ""}
-                <div class="faqvid">${v.src
-                  ? `<video controls playsinline preload="metadata" src="${esc(v.src)}"></video>`
-                  : `<div class="faqsoon"><span>🎬</span><em>Video coming soon</em></div>`}</div>
+                ${v.src ? `<div class="faqvid"><video controls playsinline preload="metadata" src="${esc(v.src)}"></video></div>` : ""}
               </section>`).join("")}</div>
           </details>`).join("")}</div>`
-          : `<div class="empty">No FAQ videos added yet.</div>`}
+          : `<div class="empty">No questions added yet.</div>`}
       </div>`;
   }
   document.addEventListener("click", (e) => {

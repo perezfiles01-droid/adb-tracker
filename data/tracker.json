@@ -1009,9 +1009,9 @@
      "blurb": "Introduction, key terms, declaring a record, roles, releases and more."
     },
     {
-     "title": "FAQ Videos",
+     "title": "Frequently Asked Questions",
      "type": "videos",
-     "blurb": "Short videos answering common questions.",
+     "blurb": "Step-by-step answers to common questions.",
      "items": [
       {
        "question": "How to declare a record?",
