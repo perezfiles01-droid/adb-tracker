@@ -11,35 +11,42 @@
       [
        "Open the site",
        "Go to an EDRMS compliant SharePoint site. The EDRMS logo shows at the top.",
-       "faq-images/mw1fycxup1wx.jpg"
+       "faq-images/mw1g5p6exvnr.jpg"
       ],
       [
        "Select the library",
-       "Choose the library, and a folder if needed."
+       "Choose the library, and a folder if needed.",
+       "faq-images/mw1g6pedaevv.jpg"
       ],
       [
        "Add the document",
-       "Click Create or upload and choose the file."
+       "Click Create or upload and choose the file.",
+       "faq-images/mw1g76qzj5im.jpg"
       ],
       [
        "Apply a sensitivity label",
-       "Required for Word, Excel and other Office files. Not required for images, video or email files."
+       "Required for Word, Excel and other Office files. Not required for images, video or email files.",
+       "faq-images/mw1g9e662et6.jpg"
       ],
       [
        "Declare",
-       "Click ⋯ next to the file and select Declare as record."
+       "Click ⋯ next to the file and select Declare as record.",
+       "faq-images/mw1gaiyvhbkr.jpg"
       ],
       [
        "Physical counterpart",
-       "Choose Yes if a paper copy exists, otherwise No."
+       "Choose Yes if a paper copy exists, otherwise No.",
+       "faq-images/mw1gbrfbuozo.jpg"
       ],
       [
        "Submit",
-       "Wait for the confirmation message. A lock icon appears on the file."
+       "Wait for the confirmation message. A lock icon appears on the file.",
+       "faq-images/mw1gcndget5m.jpg"
       ],
       [
        "Verify",
-       "Switch to the Record Management Review view and check the retention and sensitivity labels."
+       "Switch to the Record Management Review view and check the retention and sensitivity labels.",
+       "faq-images/mw1gdzoisgoq.jpg"
       ]
      ]
     },
