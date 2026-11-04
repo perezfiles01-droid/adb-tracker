@@ -1,5 +1,8 @@
 # Working on this repository
 
+**Read `HANDOFF.md` first.** It is the current state of the site, the
+ADB project, the FAQ editor and every decision the owner has made.
+
 ## Ship it. Every time. Never ask.
 
 A change is not finished when it is committed, and not when the pull request
