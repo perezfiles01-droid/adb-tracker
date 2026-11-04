@@ -548,7 +548,7 @@
       <div class="opened">
         <div class="ptiles hubtiles">${secs.map((s) => `
           <button class="ptile${open === s ? " picked" : ""}" data-hub="${esc(slug(s.title))}" aria-expanded="${open === s}">
-            <span class="t">${s.type === "book" ? "📘" : "❓"} ${esc(s.title)}</span>
+            <span class="t">${esc(s.icon || (s.type === "book" ? "📘" : "❓"))} ${esc(s.title)}</span>
             ${s.blurb ? `<span class="psub">${esc(s.blurb)}</span>` : ""}
           </button>`).join("")}</div>
         ${!open ? "" : open.type === "book" ? bookView(name, open) : faqView(open)}
@@ -564,20 +564,26 @@
 
      Screenshots are never put in localStorage: a pending one is held in
      memory until Publish, then it is a file in faq-images/. */
-  const FAQ_REPO = "perezfiles01-droid/adb-tracker", FAQ_FILE = "data/faq.json";
+  const FAQ_REPO = "perezfiles01-droid/adb-tracker";
+  // Each editable section names its own file (sec.file); the FAQ is the default.
+  let FAQ_FILE = "data/faq.json";
+  const liveData = {};
+  const loading = new Set();
+  let stageOpen = -1;   // the stage card picked in a "cards" section
   const TOKEN_KEY = "tracker.githubToken";
-  let faqLive = null, faqDraft = null, faqEditing = false, faqDirty = false, faqStatus = "";
+  let faqDraft = null, faqEditing = false, faqDirty = false, faqStatus = "";
   const faqPending = new Map();
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const rerender = () => { if (window.TrackerRender) window.TrackerRender(); };
 
-  (function faqLoad() {
-    if (!window.TRACKER_CLEAN || typeof fetch !== "function") return;
-    fetch(`${FAQ_FILE}?t=${Date.now()}`, { cache: "no-store" })
+  function faqLoad(file) {
+    if (!window.TRACKER_CLEAN || typeof fetch !== "function" || loading.has(file)) return;
+    loading.add(file);
+    fetch(`${file}?t=${Date.now()}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (j && Array.isArray(j.items)) { faqLive = j.items; if (!faqEditing) rerender(); } })
+      .then((j) => { if (j && Array.isArray(j.items)) { liveData[file] = j.items; if (!faqEditing) rerender(); } })
       .catch(() => { /* keep the copy in tracker.json */ });
-  })();
+  }
 
   // A step's screenshots: a list now. Older data held one path as a string.
   const shotsOf = (st) => (Array.isArray(st[2]) ? st[2] : st[2] ? [st[2]] : []);
@@ -638,11 +644,14 @@
   const imgSrc = (path) => (faqPending.has(path) ? faqPending.get(path) : path);
 
   function faqView(sec) {
-    const qs = faqEditing ? faqDraft : (faqLive || sec.items || []);
-    const E = faqEditing;
+    FAQ_FILE = sec.file || "data/faq.json";
+    faqLoad(FAQ_FILE);
+    const qs = faqEditing ? faqDraft : (liveData[FAQ_FILE] || sec.items || []);
+    const E = faqEditing, cards = sec.layout === "cards";
+    const noun = sec.noun || "question";
     const ed = (path, val, tag = "span", cls = "") =>
       E ? `<${tag} class="faqed ${cls}" contenteditable="plaintext-only" data-faqf="${path}">${esc(val || "")}</${tag}>`
-        : `<${tag}${cls ? ` class="${cls}"` : ""}>${esc(val || "")}</${tag}>`;
+        : `<${tag}${cls ? ` class="${cls}"` : ""}>${esc(val || "").replace(/(^|\s)(BA:.*)$/, "$1<em class=\"banote\">$2</em>")}</${tag}>`;
     const act = (a, label, cls = "") => `<button class="btn faqbtn ${cls}" data-faqact="${a}">${label}</button>`;
     return `
       <div class="opened">
@@ -653,14 +662,23 @@
             : `<button class="btn" data-faqact="edit">✎ Edit</button>`}</div>
         </div>
         ${faqStatus ? `<div class="faqstatus">${esc(faqStatus)}</div>` : ""}
-        ${!E && qs.length ? `<div class="faqsearch"><span aria-hidden="true">🔍</span>
+        ${!E && !cards && qs.length ? `<div class="faqsearch"><span aria-hidden="true">🔍</span>
           <input type="search" data-faqsearch placeholder="Search questions and steps…" aria-label="Search the FAQ" value="${esc(faqQuery)}">
           <span class="faqsearch-n" data-faqsearch-n></span></div>` : ""}
         ${E ? `<div class="bk-editnote">Click any text to change it. Use the buttons to add or delete. Nothing is saved for others until you press Publish.</div>` : ""}
-        ${qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
+        ${cards ? stageCards() : qs.length ? `<div class="faqlist">${qs.map((q, qi) => `
           <details class="faqq" data-qi="${qi}" data-find="${esc(faqText(q))}"${faqOpen.has(qi) ? " open" : ""}>
             <summary><span class="faqnum">${qi + 1}</span>${ed(`${qi}|question`, q.question)}
-              ${E ? act(`delq:${qi}`, "🗑 Delete question", "danger") : ""}</summary>
+              ${E ? act(`delq:${qi}`, `🗑 Delete ${noun}`, "danger") : ""}</summary>
+${qBody(q, qi)}
+          </details>`).join("")}</div>`
+          : `<div class="empty">Nothing added yet.</div>`}
+        ${E ? `<div style="margin-top:12px">${act("addq", `＋ Add ${noun}`)}</div>` : ""}
+      </div>`;
+
+    // The steps, guides and tools of one question (or stage).
+    function qBody(q, qi) {
+      return `
             <div class="faqhowlist">${(q.videos || []).map((v, vi) => `
               <section class="faqhow" data-find="${esc(faqText({ videos: [v] }))}">
                 <div class="faqhow-head"><span class="faqhow-icon">${esc(v.icon || "📄")}</span>
@@ -689,11 +707,21 @@
                 ${E ? act(`adds:${qi}.${vi}`, "＋ Add step") : ""}
                 ${v.src ? `<div class="faqvid"><video controls playsinline preload="metadata" src="${esc(v.src)}"></video></div>` : ""}
               </section>`).join("")}</div>
-            ${E ? act(`addg:${qi}`, "＋ Add guide") : ""}
-          </details>`).join("")}</div>`
-          : `<div class="empty">No questions added yet.</div>`}
-        ${E ? `<div style="margin-top:12px">${act("addq", "＋ Add question")}</div>` : ""}
-      </div>`;
+            ${E ? act(`addg:${qi}`, "＋ Add guide") : ""}`;
+    }
+    // A "cards" section: one clickable card per stage, the picked one opens below.
+    function stageCards() {
+      const pick = qs[stageOpen];
+      return `<div class="stagecards">${qs.map((q, qi) => `
+          <button class="stagecard${qi === stageOpen ? " picked" : ""}" data-stage="${qi}" aria-expanded="${qi === stageOpen}">
+            <span class="stage-icon">${esc(q.icon || "📌")}</span>
+            <b>${esc(q.question || "")}</b>${q.sub ? `<span>${esc(q.sub)}</span>` : ""}</button>`).join("")}</div>
+        ${pick ? `<div class="stagebody${E ? " editing" : ""}">
+            <div class="stagehead">${E ? `<b>${ed(`${stageOpen}|question`, pick.question)}</b>${ed(`${stageOpen}|sub`, pick.sub)}
+              ${act(`delq:${stageOpen}`, `🗑 Delete ${noun}`, "danger")}` : ""}</div>
+            ${qBody(pick, stageOpen)}</div>`
+          : qs.length ? `<div class="stagehint">Select a stage above to see its steps.</div>` : ""}`;
+    }
   }
 
   function faqSet(path, val) {
@@ -750,7 +778,7 @@
       const r = await api(FAQ_FILE, { method: "PUT", body: JSON.stringify({
         message: "Update the FAQ from the site", content: b64utf8(JSON.stringify({ items: faqDraft }, null, 1) + "\n"), sha }) });
       if (!r.ok) await fail(r);
-      faqLive = clone(faqDraft); faqEditing = false; faqDirty = false;
+      liveData[FAQ_FILE] = clone(faqDraft); faqEditing = false; faqDirty = false;
       faqStatus = "✓ Published. Everyone will see it in about a minute (a hard refresh may be needed).";
     } catch (err) {
       faqStatus = `Not published. ${err.message}`;
@@ -766,8 +794,8 @@
     e.preventDefault();
     const [a, arg] = b.dataset.faqact.split(":");
     const ix = (arg || "").split(".").map(Number);
-    const sec = hubSections(groups().find((g) => slug(g.name) === selected)?.name || "").find((s) => s.type === "videos");
-    if (a === "edit") { faqDraft = clone(faqLive || (sec && sec.items) || []); faqEditing = true; faqDirty = false; faqStatus = ""; }
+    const sec = hubSections(groups().find((g) => slug(g.name) === selected)?.name || "").find((s) => slug(s.title) === hubOpen);
+    if (a === "edit") { faqDraft = clone(liveData[FAQ_FILE] || (sec && sec.items) || []); faqEditing = true; faqDirty = false; faqStatus = ""; }
     else if (a === "cancel") {
       faqActive = "";
       if (faqDirty && !confirm("Discard your unpublished changes?")) return;
@@ -777,8 +805,8 @@
     else {
       const q = faqDraft[ix[0]], v = q && q.videos && q.videos[ix[1]];
       const sure = (what) => confirm(`Delete this ${what}? It is removed for everyone when you publish.`);
-      if (a === "addq") faqOpen.add(faqDraft.length), faqDraft.push({ question: "New question", videos: [{ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] }] });
-      else if (a === "delq") { if (!sure("question")) return; faqDraft.splice(ix[0], 1);
+      if (a === "addq") faqOpen.add(faqDraft.length), stageOpen = faqDraft.length, faqDraft.push({ question: "New question", videos: [{ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] }] });
+      else if (a === "delq") { if (!sure("question")) return; faqDraft.splice(ix[0], 1); stageOpen = -1;
         const kept = [...faqOpen].filter((i) => i !== ix[0]).map((i) => (i > ix[0] ? i - 1 : i));
         faqOpen.clear(); kept.forEach((i) => faqOpen.add(i)); }
       else if (a === "addg") (q.videos = q.videos || []).push({ name: "New guide", icon: "📄", desc: "", steps: [["Step title", "What to do."]] });
@@ -864,8 +892,17 @@
   window.addEventListener("beforeunload", (e) => { if (faqEditing && faqDirty) { e.preventDefault(); e.returnValue = ""; } });
 
   document.addEventListener("click", (e) => {
+    const c = e.target.closest && e.target.closest("[data-stage]");
+    if (!c) return;
+    stageOpen = stageOpen === +c.dataset.stage ? -1 : +c.dataset.stage;
+    faqActive = "";
+    rerender();
+  });
+  document.addEventListener("click", (e) => {
     const h = e.target.closest && e.target.closest("[data-hub]");
     if (!h) return;
+    if (faqEditing && faqDirty && !confirm("Leave without publishing? Your unpublished changes will be lost.")) return;
+    faqEditing = false; faqPending.clear(); faqStatus = ""; faqActive = ""; faqOpen.clear(); stageOpen = -1;
     hubOpen = hubOpen === h.dataset.hub ? "" : h.dataset.hub;
     if (window.TrackerRender) window.TrackerRender();
   });

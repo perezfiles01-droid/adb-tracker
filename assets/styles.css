@@ -889,3 +889,19 @@ p.faqed { display: block; margin: 4px 0 0; }
 .faqsearch input { flex: 1; border: 0; background: transparent; padding: 11px 0; font: inherit; color: inherit; outline: none; }
 .faqsearch:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
 .faqsearch-n { font-size: .8rem; opacity: .6; white-space: nowrap; }
+/* BA Tasks: four stage cards, the picked one opens below */
+.stagecards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stagecard { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; padding: 16px;
+  border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: inherit; font: inherit; cursor: pointer;
+  transition: transform .15s, box-shadow .15s, border-color .15s; }
+.stagecard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+.stagecard.picked { border-color: var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.stagecard b { font-size: 1.1rem; } .stagecard span:not(.stage-icon) { font-size: .85rem; opacity: .7; }
+.stage-icon { font-size: 1.6rem; }
+.stagebody { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); }
+.stagehead { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.stagehead:empty { display: none; }
+.stagehint { opacity: .6; font-size: .9rem; padding: 8px 2px; }
+.banote { display: block; font-style: italic; opacity: .85; margin-top: 2px; }
+@media (max-width: 760px) { .stagecards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stagebody:not(.editing) .faqhow-head { display: none; }
